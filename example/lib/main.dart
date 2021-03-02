@@ -26,8 +26,8 @@ class _ExampleState extends State<Example> {
   int counter = 0;
   bool loading = true;
 
-  Future<Widget> future;
-  StreamSubscription _subscription;
+  late Future<Widget> future;
+  late StreamSubscription _subscription;
 
   @override
   void initState() {
@@ -125,7 +125,7 @@ class _ExampleState extends State<Example> {
   }
 
   Widget counterCard(Curve curve,
-          {WiperBuilder builder,
+          {WiperBuilder? builder,
           double wiperWidth = 15,
           double deformingFactor = 0.5,
           WiperDirection direction = WiperDirection.right, EdgeInsetsGeometry padding = const EdgeInsets.all(15.0)}) =>
@@ -157,7 +157,7 @@ class _ExampleState extends State<Example> {
         ),
       );
 
-  Widget counterCardCircle(Curve curve, {WiperBuilder builder}) => InkWell(
+  Widget counterCardCircle(Curve curve, {WiperBuilder? builder}) => InkWell(
     onTap: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (c)=>LoadingScaffold())),
     child: Card(
           elevation: 5.0,
@@ -192,7 +192,7 @@ class LoadingScaffold extends StatefulWidget {
 class _LoadingScaffoldState extends State<LoadingScaffold> {
   Future future = Future.delayed(Duration(seconds: 3));
 
-  StreamSubscription _subscription;
+  late StreamSubscription _subscription;
   bool loading = true;
 
   @override

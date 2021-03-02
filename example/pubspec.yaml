@@ -4,7 +4,7 @@ description: Example Project for the package widget_loading.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0-259.16.beta <3.0.0"
 
 dependencies:
   flutter:
