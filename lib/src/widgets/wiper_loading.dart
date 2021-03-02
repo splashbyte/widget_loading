@@ -118,21 +118,19 @@ class WiperLoading extends StatefulWidget {
 class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMixin, LoadingWidget {
   AnimationController _controller;
   CurvedAnimation _animation;
-  double pointPosition = 0;
-  double circleWidth;
-  Widget child;
+  double _pointPosition = 0;
+  double _circleWidth;
+  Widget _child;
 
-  Widget loadedChild;
+  Widget _loadedChild;
 
-  final childKey = GlobalKey();
-
-  Future<Widget> future;
+  final _childKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
 
-    child = widget.child;
+    _child = widget.child;
 
     loadingState = widget.loading ? LoadingState.LOADING : LoadingState.LOADED;
 
@@ -143,6 +141,7 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
 
     _animation = CurvedAnimation(parent: _controller, curve: widget.curve)
       ..addListener(() {
+        if(loaded) return;
         setState(() {});
       })
       ..addStatusListener((status) {
@@ -207,8 +206,8 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
           ),
           widget.animatedSize
               ? AnimatedSize(
-                  key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: child)
-              : child,
+                  key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
+              : Container(key: key, child: _child),
         ],
       );
 
@@ -227,14 +226,15 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
       _controller.animateBack(0.0);
     }
 
-    if (!disappearing) child = widget.child;
+    if (!disappearing) _child = widget.child;
 
-    loadedChild = animatedSizeWidget(childKey);
+    _loadedChild = animatedSizeWidget(_childKey);
     Color color = widget.wiperColor ?? Theme.of(context).accentColor;
 
     bool vertical = up || down;
+    TextDirection textDirection = Directionality.of(context);
 
-    return Stack(
+    Widget stack =  Stack(
       children: [
         //WidgetSizedBox(child: animatedSizeWidget(pseudoChildKey),),
         Container(
@@ -245,20 +245,20 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
           appearing || disappearing
               ? ClipRect(
                   clipper: WiperRectClipper(widget.direction, _animation.value),
-                  child: loadedChild,
+                  child: _loadedChild,
                 )
               : WidgetSizedBox(
-                  child: loadedChild,
+                  child: _loadedChild,
                 ),
         loaded
-            ? loadedChild
+            ? _loadedChild
             : Positioned.fill(
                 child: LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     Size biggest = constraints.biggest;
                     double height = biggest.height ?? 50;
                     double width = biggest.width;
-                    circleWidth = widget.wiperWidth *
+                    _circleWidth = widget.wiperWidth *
                         (1 + _animation.speed.abs() * widget.wiperDeformingFactor) *
                         (appearing || disappearing ? 1 - _animation.value : 1);
                     /*((appearing || disappearing)
@@ -267,19 +267,19 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
                             : (1.0 + 9 * pow(0.5 - (_animation.value - 0.5).abs(), 2)))
                         : (loaded ? 0.0 : (1.0 + 9 * pow(0.5 - (_animation.value - 0.5).abs(), 2))));*/
                     Widget wiper =
-                        widget.wiperBuilder?.call(vertical ? width : circleWidth, vertical ? circleWidth : height) ??
-                            _loadingWiper(vertical ? width : circleWidth, vertical ? circleWidth : height, color);
-                    pointPosition = (_animation.value * ((vertical ? height : width) - circleWidth));
+                        widget.wiperBuilder?.call(vertical ? width : _circleWidth, vertical ? _circleWidth : height) ??
+                            _loadingWiper(vertical ? width : _circleWidth, vertical ? _circleWidth : height, color);
+                    _pointPosition = (_animation.value * ((vertical ? height : width) - _circleWidth));
                     return Container(
                       width: width,
                       height: height,
                       child: Stack(
                         children: [
                           Positioned(
-                            left: right ? pointPosition : null,
-                            right: left ? pointPosition : null,
-                            top: down ? pointPosition : null,
-                            bottom: up ? pointPosition : null,
+                            left: right ? _pointPosition : null,
+                            right: left ? _pointPosition : null,
+                            top: down ? _pointPosition : null,
+                            bottom: up ? _pointPosition : null,
                             child: wiper,
                           )
                         ],
@@ -290,6 +290,7 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
               ),
       ],
     );
+    return textDirection!=null?stack:Directionality(textDirection: TextDirection.ltr, child: stack);
   }
 }
 

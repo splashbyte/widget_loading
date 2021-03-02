@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:widget_loading/src/utils/loading_state.dart';
 
 abstract class LoadingWidget {

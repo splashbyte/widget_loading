@@ -66,8 +66,6 @@ class _ExampleState extends State<Example> {
 
   @override
   Widget build(BuildContext context) {
-    TextTheme textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
       body: Center(
         child: Padding(
@@ -173,7 +171,7 @@ class _ExampleState extends State<Example> {
                 '$counter',
                 style: Theme.of(context).textTheme.headline5,
               ),
-            ),
+            )
           ),
         ),
       );

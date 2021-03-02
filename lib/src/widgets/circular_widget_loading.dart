@@ -19,7 +19,7 @@ class CircularWidgetLoading extends StatefulWidget {
   /// Size of the biggest dot
   final double dotRadius;
 
-  /// Size of the smallest dot relativ to the [dotRadius]. Must be between 0 and 1.
+  /// Size of the smallest dot relative to the [dotRadius]. Must be between 0 and 1.
   final double minDotRadiusFactor;
 
   /// Duration of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
@@ -42,15 +42,17 @@ class CircularWidgetLoading extends StatefulWidget {
 
   /// Color of the dots
   final Color dotColor;
+
   /// Padding of child
   final EdgeInsetsGeometry padding;
+
   /// Builder of the dots. If it is not set, the standard builder is used.
   final DotBuilder dotBuilder;
 
-  /// Duration of moving dots relativ to the [loadingDuration]. Must be between 0 and 1.
+  /// Duration of moving dots relative to the [loadingDuration]. Must be between 0 and 1.
   final double rollingDuration;
 
-  /// Duration of the moving of a single dot relativ to the [rollingDuration]. Must be between 0 and 1.
+  /// Duration of the moving of a single dot relative to the [rollingDuration]. Must be between 0 and 1.
   final double rollingFactor;
 
   /// Count of the dots in the loading-circle.
@@ -95,28 +97,28 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
   Animation<double> _appearingAnimation;
   List<Animation<double>> _animations = [];
 
-  final childKey = GlobalKey();
+  final _childKey = GlobalKey();
 
-  Widget child;
+  Widget _child;
 
   @override
   void initState() {
     super.initState();
 
-    assert(widget.rollingDuration >= 0 &&
-        widget.rollingDuration <= 1 &&
-        widget.rollingFactor >= 0 &&
-        widget.rollingFactor <= 1);
+    assert(widget.rollingDuration >= 0 && widget.rollingDuration <= 1);
+    assert(widget.rollingFactor >= 0 && widget.rollingFactor <= 1);
+    assert(widget.minDotRadiusFactor >= 0 && widget.minDotRadiusFactor <= 1);
 
     loadingState = widget.loading ? LoadingState.LOADING : LoadingState.LOADED;
 
-    child = widget.child;
+    _child = widget.child;
 
     _appearingController = AnimationController(
       duration: widget.appearingDuration,
       vsync: this,
     )
       ..addListener(() {
+        if (!appearing && !disappearing) return;
         setState(() {});
       })
       ..addStatusListener((status) {
@@ -130,6 +132,10 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
           case AnimationStatus.completed:
             if (appearing) loadingState = LoadingState.LOADED;
             break;
+          case AnimationStatus.forward:
+            break;
+          case AnimationStatus.reverse:
+            break;
         }
       });
 
@@ -140,6 +146,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
       vsync: this,
     )
       ..addListener(() {
+        if (!loading) return;
         setState(() {});
       })
       ..addStatusListener((status) {
@@ -186,8 +193,8 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
             padding: widget.padding,
             child: widget.animatedSize
                 ? AnimatedSize(
-                    key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: child)
-                : child,
+                    key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
+                : Container(key: key, child: _child),
           ),
         ],
       );
@@ -202,17 +209,19 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
       _appearingController.forward();
     }
 
-    if (!disappearing) child = widget.child;
+    if (!disappearing) _child = widget.child;
 
-    Widget loadedChild = animatedSizeWidget(childKey);
+    Widget loadedChild = animatedSizeWidget(_childKey);
     ThemeData theme = Theme.of(context);
     Color dotColor = widget.dotColor ?? theme.accentColor;
+    TextDirection textDirection = Directionality.of(context);
 
-    return Stack(
+    Widget stack = Stack(
       children: [
-        if(loading) WidgetSizedBox(
-          child: animatedSizeWidget(childKey),
-        ),
+        if (loading)
+          WidgetSizedBox(
+            child: loadedChild,
+          ),
         if (loaded)
           loadedChild
         else if (appearing || disappearing)
@@ -254,6 +263,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
           ),
       ],
     );
+    return textDirection != null ? stack : Directionality(textDirection: TextDirection.ltr, child: stack);
 
     /*return Stack(
       children: [
