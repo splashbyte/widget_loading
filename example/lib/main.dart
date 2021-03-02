@@ -67,6 +67,7 @@ class _ExampleState extends State<Example> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text('Example'),),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -156,23 +157,70 @@ class _ExampleState extends State<Example> {
         ),
       );
 
-  Widget counterCardCircle(Curve curve, {WiperBuilder builder}) => Card(
-        elevation: 5.0,
-        child: CircularWidgetLoading(
-          loading: loading,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 50.0),
-            child: ListTile(
-              leading: Text(
-                'Counter',
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              trailing: Text(
-                '$counter',
-                style: Theme.of(context).textTheme.headline5,
-              ),
-            )
+  Widget counterCardCircle(Curve curve, {WiperBuilder builder}) => InkWell(
+    onTap: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (c)=>LoadingScaffold())),
+    child: Card(
+          elevation: 5.0,
+          child: CircularWidgetLoading(
+            dotColor: Colors.red,
+            dotCount: 10,
+            rollingFactor: 0.8,
+            loading: loading,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 50.0),
+              child: ListTile(
+                leading: Text(
+                  'Counter',
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+                trailing: Text(
+                  '$counter',
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+              )
+            ),
           ),
         ),
-      );
+  );
+}
+
+class LoadingScaffold extends StatefulWidget {
+  @override
+  _LoadingScaffoldState createState() => _LoadingScaffoldState();
+}
+
+class _LoadingScaffoldState extends State<LoadingScaffold> {
+  Future future = Future.delayed(Duration(seconds: 3));
+
+  StreamSubscription _subscription;
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _subscription = Stream.periodic(Duration(seconds: 4)).listen((i) {
+      setState(() {
+        loading = !loading;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(child: CircularWidgetLoading(
+      padding: EdgeInsets.zero,
+      child: Scaffold(
+        appBar: AppBar(title: Text('Example')),
+        body: Center(child: Text('Loaded!')),
+      ),
+      loading: loading,
+    ));
+  }
 }

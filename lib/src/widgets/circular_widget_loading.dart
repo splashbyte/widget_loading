@@ -380,7 +380,7 @@ class DotClipper extends CustomClipper<Rect> {
     double x = size.width / 2;
     double y = size.height / 2;
 
-    double maxAppearingRadius = max(x, y);
+    double maxAppearingRadius = sqrt(x * x + y * y);
     double appearingRadius = dotRadius + factor * (maxAppearingRadius - dotRadius);
     return Rect.fromCircle(center: Offset(x, y - radius), radius: appearingRadius);
   }
