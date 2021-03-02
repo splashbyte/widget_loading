@@ -3,7 +3,7 @@
 <a href="https://pub.dev/packages/widget_loading"><img src="https://img.shields.io/pub/v/widget_loading.svg?style=flat?logo=dart" alt="pub.dev"></a>
 <a href="https://github.com/SplashByte/widget_loading"><img src="https://img.shields.io/static/v1?label=platform&message=flutter&color=1ebbfd" alt="github"></a>
 <a href="https://pub.dev/packages/widget_loading/score"><img src="https://badges.bar/widget_loading/likes" alt="likes"></a>
-<a href="https://github.com/SplashByte/widget_loading/raw/LICENSE"><img src="https://img.shields.io/github/license/SplashByte/widget_loading.svg" alt="license"></a>
+<a href="https://github.com/SplashByte/widget_loading/blob/main/LICENSE"><img src="https://img.shields.io/github/license/SplashByte/widget_loading.svg" alt="license"></a>
 
 A simple widget for loading widget contents.
 It's an easy way to hide a widget when you have nothing to show and need a loading animation at the same time.
