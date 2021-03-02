@@ -3,6 +3,8 @@
 A simple widget for loading widget contents.
 It's an easy way to hide a widget when you have nothing to show and need a loading animation at the same time.
 
+![example](https://user-images.githubusercontent.com/43761463/109582113-dbed2b00-7afd-11eb-8098-08418c2bd76b.gif)
+
 ## Easy Usage
 
 ### WiperLoading
