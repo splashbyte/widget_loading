@@ -1,0 +1,1 @@
+enum LoadingState { APPEARING, DISAPPEARING, LOADED, LOADING }
