@@ -41,13 +41,13 @@ class CircularWidgetLoading extends StatefulWidget {
   final Curve loadingCurve;
 
   /// Color of the dots
-  final Color dotColor;
+  final Color? dotColor;
 
   /// Padding of child
   final EdgeInsetsGeometry padding;
 
   /// Builder of the dots. If it is not set, the standard builder is used.
-  final DotBuilder dotBuilder;
+  final DotBuilder? dotBuilder;
 
   /// Duration of moving dots relative to the [loadingDuration]. Must be between 0 and 1.
   final double rollingDuration;
@@ -65,12 +65,12 @@ class CircularWidgetLoading extends StatefulWidget {
   final double loadingCirclePadding;
 
   const CircularWidgetLoading({
-    Key key,
+    Key? key,
     this.loading = true,
     this.maxLoadingCircleSize = 75.0,
     this.sizeDuration = const Duration(milliseconds: 500),
     this.sizeCurve = Curves.linear,
-    this.child,
+    required this.child,
     this.dotRadius = 7.5,
     this.dotColor,
     this.appearingDuration = const Duration(milliseconds: 1000),
@@ -92,14 +92,14 @@ class CircularWidgetLoading extends StatefulWidget {
 }
 
 class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with TickerProviderStateMixin, LoadingWidget {
-  AnimationController _controller;
-  AnimationController _appearingController;
-  Animation<double> _appearingAnimation;
+  late AnimationController _controller;
+  late AnimationController _appearingController;
+  late Animation<double> _appearingAnimation;
   List<Animation<double>> _animations = [];
 
   final _childKey = GlobalKey();
 
-  Widget _child;
+  Widget _child = Container();
 
   @override
   void initState() {
@@ -160,11 +160,9 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
           case AnimationStatus.completed:
             if (!widget.loading && loading) {
               loadingState = LoadingState.APPEARING;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _appearingController.forward(from: 0.0);
-              });
+              _appearingController.forward(from: 0.0);
             } else
-              WidgetsBinding.instance.addPostFrameCallback((_) => _controller.forward(from: 0.0));
+              WidgetsBinding.instance?.addPostFrameCallback((_) => _controller.forward(from: 0.0));
             break;
         }
       });
@@ -214,7 +212,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
     Widget loadedChild = animatedSizeWidget(_childKey);
     ThemeData theme = Theme.of(context);
     Color dotColor = widget.dotColor ?? theme.accentColor;
-    TextDirection textDirection = Directionality.of(context);
+    TextDirection textDirection = Directionality.maybeOf(context)??TextDirection.ltr;
 
     Widget stack = Stack(
       children: [
@@ -239,7 +237,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
           Positioned.fill(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-                double radius = min(widget.maxLoadingCircleSize ?? double.infinity,
+                double radius = min(widget.maxLoadingCircleSize,
                             min(constraints.maxWidth, constraints.maxHeight) - 2 * widget.loadingCirclePadding) /
                         2 -
                     widget.dotRadius;
@@ -263,7 +261,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
           ),
       ],
     );
-    return textDirection != null ? stack : Directionality(textDirection: TextDirection.ltr, child: stack);
+    return Directionality(textDirection: textDirection, child: stack);
 
     /*return Stack(
       children: [
@@ -375,7 +373,7 @@ class DotClipper extends CustomClipper<Rect> {
   @override
   Rect getClip(Size size) {
     double radius =
-        min(maxLoadingCircleSize ?? double.infinity, min(size.width, size.height) - 2 * loadingCirclePadding) / 2 -
+        min(maxLoadingCircleSize, min(size.width, size.height) - 2 * loadingCirclePadding) / 2 -
             dotRadius;
     double x = size.width / 2;
     double y = size.height / 2;

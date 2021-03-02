@@ -1,3 +1,7 @@
+## [0.2.0] - (2021-03-02)
+
+- Migrates to null safety
+
 ## [0.1.2] - (2021-03-02)
 
 - Fixes key handling if animatedSize is false

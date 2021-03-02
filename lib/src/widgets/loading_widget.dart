@@ -1,7 +1,7 @@
 import 'package:widget_loading/src/utils/loading_state.dart';
 
 abstract class LoadingWidget {
-  LoadingState _loadingState;
+  LoadingState _loadingState = LoadingState.LOADED;
 
   set loadingState(LoadingState value) {
     _loadingState = value;

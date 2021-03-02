@@ -34,7 +34,7 @@ class WiperLoading extends StatefulWidget {
   final double wiperWidth;
 
   /// Color of the wiper animation if the [wiperBuilder] is null
-  final Color wiperColor;
+  final Color? wiperColor;
 
   /// Curve of the AnimatedSize. For deactivating animatedSize you can use [animatedSize].
   final Curve sizeCurve;
@@ -49,16 +49,16 @@ class WiperLoading extends StatefulWidget {
   final double wiperDeformingFactor;
 
   /// Builder of the wiper. If this is not set, the standard wiper will be shown.
-  final WiperBuilder wiperBuilder;
+  final WiperBuilder? wiperBuilder;
 
   /// Direction of the wiper.
   final WiperDirection direction;
 
   const WiperLoading({
-    Key key,
-    this.minWidth,
-    this.minHeight,
-    this.child,
+    Key? key,
+    this.minWidth = 0,
+    this.minHeight = 0,
+    required this.child,
     this.interval = const Duration(milliseconds: 750),
     this.loading = true,
     this.wiperColor,
@@ -73,16 +73,16 @@ class WiperLoading extends StatefulWidget {
   }) : super(key: key);
 
   static Widget future({
-    Key key,
-    @required Future<Widget> future,
+    Key? key,
+    required Future<Widget> future,
     double minWidth = 50,
     double minHeight = 50,
     Duration interval = const Duration(milliseconds: 750),
-    Color wiperColor,
+    Color? wiperColor,
     Curve sizeCurve = Curves.linear,
     Duration sizeDuration = const Duration(milliseconds: 500),
     Curve curve = Curves.easeInOutCirc,
-    WiperBuilder wiperBuilder,
+    WiperBuilder? wiperBuilder,
     bool animatedSize = true,
     double wiperDeformingFactor = 0.5,
     double wiperWidth = 15.0,
@@ -116,13 +116,11 @@ class WiperLoading extends StatefulWidget {
 }
 
 class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMixin, LoadingWidget {
-  AnimationController _controller;
-  CurvedAnimation _animation;
+  late AnimationController _controller;
+  late CurvedAnimation _animation;
   double _pointPosition = 0;
-  double _circleWidth;
-  Widget _child;
+  late Widget _child;
 
-  Widget _loadedChild;
 
   final _childKey = GlobalKey();
 
@@ -149,7 +147,7 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
           case AnimationStatus.forward:
             if (!widget.loading && loading && !appearing) {
               loadingState = LoadingState.APPEARING;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
+              WidgetsBinding.instance?.addPostFrameCallback((_) {
                 _controller.animateTo(1.0);
               });
             }
@@ -157,7 +155,7 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
           case AnimationStatus.reverse:
             if (widget.loading && !loading && !disappearing) {
               loadingState = LoadingState.DISAPPEARING;
-              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+              WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
                 _controller.animateBack(0.0);
               });
             }
@@ -228,11 +226,11 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
 
     if (!disappearing) _child = widget.child;
 
-    _loadedChild = animatedSizeWidget(_childKey);
+    Widget _loadedChild = animatedSizeWidget(_childKey);
     Color color = widget.wiperColor ?? Theme.of(context).accentColor;
 
     bool vertical = up || down;
-    TextDirection textDirection = Directionality.of(context);
+    TextDirection textDirection = Directionality.maybeOf(context)??TextDirection.ltr;
 
     Widget stack =  Stack(
       children: [
@@ -256,9 +254,9 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
                 child: LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     Size biggest = constraints.biggest;
-                    double height = biggest.height ?? 50;
+                    double height = constraints.hasBoundedHeight?biggest.height:50;
                     double width = biggest.width;
-                    _circleWidth = widget.wiperWidth *
+                    double _circleWidth = widget.wiperWidth *
                         (1 + _animation.speed.abs() * widget.wiperDeformingFactor) *
                         (appearing || disappearing ? 1 - _animation.value : 1);
                     /*((appearing || disappearing)
@@ -290,7 +288,7 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
               ),
       ],
     );
-    return textDirection!=null?stack:Directionality(textDirection: TextDirection.ltr, child: stack);
+    return Directionality(textDirection: textDirection, child: stack);
   }
 }
 
@@ -314,7 +312,7 @@ class CustomRect extends CustomClipper<Rect> {
 class WidgetSizedBox extends StatelessWidget {
   final Widget child;
 
-  const WidgetSizedBox({Key key, this.child}) : super(key: key);
+  const WidgetSizedBox({Key? key, required this.child}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
