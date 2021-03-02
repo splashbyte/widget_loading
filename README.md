@@ -44,7 +44,7 @@ or
 WiperLoading.future(future: futureOfYourWidget, ...)
 ```
 
-### CircularLoading
+### CircularWidgetLoading
 
 ```dart
 CircularWidgetLoading(
