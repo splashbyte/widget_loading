@@ -9,6 +9,8 @@ typedef DotBuilder = Widget Function(double radius);
 
 class CircularWidgetLoading extends StatefulWidget {
   final Widget child;
+
+  /// Indicates whether the widget/data is loaded.
   final bool loading;
 
   /// Maximal size of the loading-circle. It's size will be smaller, if there is not enough space.
@@ -20,17 +22,29 @@ class CircularWidgetLoading extends StatefulWidget {
   /// Size of the smallest dot relativ to the [dotRadius]. Must be between 0 and 1.
   final double minDotRadiusFactor;
 
-  /// Duration of the AnimatedSize. For deactivating animatedSize you can use [animatedSize].
+  /// Duration of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
   final Duration sizeDuration;
-  final Duration appearingDuration, loadingDuration;
 
-  /// Curve of the AnimatedSize. For deactivating animatedSize you can use [animatedSize].
+  /// Duration of the appearing/disappearing of the [child].
+  final Duration appearingDuration;
+
+  /// Duration of the loading-animation.
+  final Duration loadingDuration;
+
+  /// Curve of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
   final Curve sizeCurve;
-  final Curve appearingCurve, loadingCurve;
+
+  /// Curve of the appearing/disappearing of the [child].
+  final Curve appearingCurve;
+
+  /// Curve of the loading-animation.
+  final Curve loadingCurve;
 
   /// Color of the dots
   final Color dotColor;
+  /// Padding of child
   final EdgeInsetsGeometry padding;
+  /// Builder of the dots. If it is not set, the standard builder is used.
   final DotBuilder dotBuilder;
 
   /// Duration of moving dots relativ to the [loadingDuration]. Must be between 0 and 1.
@@ -38,11 +52,14 @@ class CircularWidgetLoading extends StatefulWidget {
 
   /// Duration of the moving of a single dot relativ to the [rollingDuration]. Must be between 0 and 1.
   final double rollingFactor;
+
+  /// Count of the dots in the loading-circle.
   final int dotCount;
 
   /// Activating/deactivating AnimatedSize-Wrapper of [child].
   final bool animatedSize;
 
+  /// Padding of LoadingCircle. Prevents it from touching the edges.
   final double loadingCirclePadding;
 
   const CircularWidgetLoading({
@@ -79,7 +96,6 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
   List<Animation<double>> _animations = [];
 
   final childKey = GlobalKey();
-  final pseudoChildKey = GlobalKey();
 
   Widget child;
 
@@ -194,8 +210,8 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
 
     return Stack(
       children: [
-        WidgetSizedBox(
-          child: animatedSizeWidget(pseudoChildKey),
+        if(loading) WidgetSizedBox(
+          child: animatedSizeWidget(childKey),
         ),
         if (loaded)
           loadedChild

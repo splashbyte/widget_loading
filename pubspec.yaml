@@ -1,6 +1,6 @@
 name: widget_loading
 description: Simple widget for loading widget contents.
-version: 0.1.0
+version: 0.1.1
 homepage: https://splashbyte.dev
 
 environment:

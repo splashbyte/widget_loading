@@ -13,8 +13,12 @@ enum WiperDirection { up, down, left, right }
 typedef WiperBuilder = Widget Function(double width, double height);
 
 class WiperLoading extends StatefulWidget {
-  /// Min size of the wiper widget.
-  final double minWidth, minHeight;
+  /// Min width of the wiper widget.
+  final double minWidth;
+
+  /// Min width of the wiper widget.
+  final double minHeight;
+
   final Widget child;
 
   /// Curve of the wiper animation.
@@ -23,7 +27,7 @@ class WiperLoading extends StatefulWidget {
   /// Duration of the wiper animation.
   final Duration interval;
 
-  /// Defines, if the widget is currently wiper.
+  /// Indicates whether the widget/data is loaded.
   final bool loading;
 
   /// Standard width of the wiper.
@@ -121,7 +125,6 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
   Widget loadedChild;
 
   final childKey = GlobalKey();
-  final pseudoChildKey = GlobalKey();
 
   Future<Widget> future;
 
