@@ -16,7 +16,6 @@ extension Derivation on CurvedAnimation{
         double value = min(this.parent.value + dif, 1.0);
         if(value == this.parent.value) return 0.0;
         return (this.value - this.curve.transform(value))/(value-this.parent.value);
-        break;
       case AnimationStatus.dismissed:
       case AnimationStatus.completed:
         break;
