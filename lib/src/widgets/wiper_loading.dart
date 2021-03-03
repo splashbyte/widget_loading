@@ -115,7 +115,7 @@ class WiperLoading extends StatefulWidget {
   _WiperLoadingState createState() => _WiperLoadingState();
 }
 
-class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMixin, LoadingWidget {
+class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMixin, LoadingWidgetState {
   late AnimationController _controller;
   late CurvedAnimation _animation;
   double _pointPosition = 0;

@@ -91,7 +91,7 @@ class CircularWidgetLoading extends StatefulWidget {
   _CircularWidgetLoadingState createState() => _CircularWidgetLoadingState();
 }
 
-class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with TickerProviderStateMixin, LoadingWidget {
+class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with TickerProviderStateMixin, LoadingWidgetState {
   late AnimationController _controller;
   late AnimationController _appearingController;
   late Animation<double> _appearingAnimation;
