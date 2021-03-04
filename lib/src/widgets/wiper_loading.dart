@@ -5,10 +5,16 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:widget_loading/src/utils/extensions.dart';
 import 'package:widget_loading/src/utils/loading_state.dart';
+import 'package:widget_loading/src/widgets/widget_sized_box.dart';
 
 import 'loading_widget.dart';
 
-enum WiperDirection { up, down, left, right }
+enum WiperDirection {
+  up,
+  down,
+  left,
+  right,
+}
 
 typedef WiperBuilder = Widget Function(double width, double height);
 
@@ -115,12 +121,11 @@ class WiperLoading extends StatefulWidget {
   _WiperLoadingState createState() => _WiperLoadingState();
 }
 
-class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMixin, LoadingWidget {
-  late AnimationController _controller;
-  late CurvedAnimation _animation;
+class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMixin, LoadingWidgetState {
+  late final AnimationController _controller;
+  late final CurvedAnimation _animation;
   double _pointPosition = 0;
   late Widget _child;
-
 
   final _childKey = GlobalKey();
 
@@ -139,7 +144,7 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
 
     _animation = CurvedAnimation(parent: _controller, curve: widget.curve)
       ..addListener(() {
-        if(loaded) return;
+        if (loaded) return;
         setState(() {});
       })
       ..addStatusListener((status) {
@@ -230,9 +235,9 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
     Color color = widget.wiperColor ?? Theme.of(context).accentColor;
 
     bool vertical = up || down;
-    TextDirection textDirection = Directionality.maybeOf(context)??TextDirection.ltr;
+    TextDirection textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
 
-    Widget stack =  Stack(
+    Widget stack = Stack(
       children: [
         //WidgetSizedBox(child: animatedSizeWidget(pseudoChildKey),),
         Container(
@@ -242,7 +247,7 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
         if (!loaded)
           appearing || disappearing
               ? ClipRect(
-                  clipper: WiperRectClipper(widget.direction, _animation.value),
+                  clipper: _WiperRectClipper(widget.direction, _animation.value),
                   child: _loadedChild,
                 )
               : WidgetSizedBox(
@@ -254,7 +259,7 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
                 child: LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     Size biggest = constraints.biggest;
-                    double height = constraints.hasBoundedHeight?biggest.height:50;
+                    double height = constraints.hasBoundedHeight ? biggest.height : 50;
                     double width = biggest.width;
                     double _circleWidth = widget.wiperWidth *
                         (1 + _animation.speed.abs() * widget.wiperDeformingFactor) *
@@ -292,51 +297,20 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
   }
 }
 
-class CustomRect extends CustomClipper<Rect> {
-  CustomRect(this.widthAmount);
-
-  final double widthAmount;
-
-  @override
-  Rect getClip(Size size) {
-    Rect rect = Rect.fromLTRB(widthAmount, 0, size.width - widthAmount, size.height);
-    return rect;
-  }
-
-  @override
-  bool shouldReclip(CustomRect oldClipper) {
-    return oldClipper.widthAmount != widthAmount;
-  }
-}
-
-class WidgetSizedBox extends StatelessWidget {
-  final Widget child;
-
-  const WidgetSizedBox({Key? key, required this.child}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-      child: child,
-      opacity: 0.0,
-    );
-  }
-}
-
-class WiperRectClipper extends CustomClipper<Rect> {
+class _WiperRectClipper extends CustomClipper<Rect> {
   final WiperDirection direction;
   final double factor;
 
-  WiperRectClipper(this.direction, this.factor);
+  _WiperRectClipper(this.direction, this.factor);
 
   @override
   Rect getClip(Size size) {
     return direction == WiperDirection.left
-        ? Rect.fromLTWH(size.width * (1-factor), 0, size.width * factor, size.height)
+        ? Rect.fromLTWH(size.width * (1 - factor), 0, size.width * factor, size.height)
         : direction == WiperDirection.right
             ? Rect.fromLTWH(0, 0, size.width * factor, size.height)
             : direction == WiperDirection.up
-                ? Rect.fromLTWH(0, size.height * (1-factor), size.width, size.height * factor)
+                ? Rect.fromLTWH(0, size.height * (1 - factor), size.width, size.height * factor)
                 : Rect.fromLTWH(0, 0, size.width, size.height * factor);
   }
 
@@ -348,7 +322,7 @@ class WiperRectClipper extends CustomClipper<Rect> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is WiperRectClipper &&
+      other is _WiperRectClipper &&
           runtimeType == other.runtimeType &&
           direction == other.direction &&
           factor == other.factor;
