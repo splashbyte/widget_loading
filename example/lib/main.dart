@@ -67,7 +67,9 @@ class _ExampleState extends State<Example> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Example'),),
+      appBar: AppBar(
+        title: Text('Example'),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -92,13 +94,14 @@ class _ExampleState extends State<Example> {
                         height: height,
                         decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
                     wiperWidth: 50),
-                counterCard(Curves.linear,
-                    builder: (width, height) => Container(
-                        width: width,
-                        height: height,
-                        decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
-                    wiperWidth: 10,
-                    deformingFactor: 0.2,
+                counterCard(
+                  Curves.linear,
+                  builder: (width, height) => Container(
+                      width: width,
+                      height: height,
+                      decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
+                  wiperWidth: 10,
+                  deformingFactor: 0.2,
                   direction: WiperDirection.up,
                 ),
                 counterCard(Curves.easeInOutCirc, padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 30.0)),
@@ -114,7 +117,8 @@ class _ExampleState extends State<Example> {
                         width: width,
                         height: height,
                         decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
-                    wiperWidth: 20, direction: WiperDirection.left),
+                    wiperWidth: 20,
+                    direction: WiperDirection.left),
                 counterCardCircle(Curves.linear),
               ],
             ),
@@ -128,7 +132,8 @@ class _ExampleState extends State<Example> {
           {WiperBuilder? builder,
           double wiperWidth = 15,
           double deformingFactor = 0.5,
-          WiperDirection direction = WiperDirection.right, EdgeInsetsGeometry padding = const EdgeInsets.all(15.0)}) =>
+          WiperDirection direction = WiperDirection.right,
+          EdgeInsetsGeometry padding = const EdgeInsets.all(15.0)}) =>
       Card(
         elevation: 5.0,
         child: Padding(
@@ -158,8 +163,8 @@ class _ExampleState extends State<Example> {
       );
 
   Widget counterCardCircle(Curve curve, {WiperBuilder? builder}) => InkWell(
-    onTap: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (c)=>LoadingScaffold())),
-    child: Card(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (c) => LoadingScaffold())),
+        child: Card(
           elevation: 5.0,
           child: CircularWidgetLoading(
             dotColor: Colors.red,
@@ -167,21 +172,20 @@ class _ExampleState extends State<Example> {
             rollingFactor: 0.8,
             loading: loading,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 50.0),
-              child: ListTile(
-                leading: Text(
-                  'Counter',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
-                trailing: Text(
-                  '$counter',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
-              )
-            ),
+                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 50.0),
+                child: ListTile(
+                  leading: Text(
+                    'Counter',
+                    style: Theme.of(context).textTheme.headline5,
+                  ),
+                  trailing: Text(
+                    '$counter',
+                    style: Theme.of(context).textTheme.headline5,
+                  ),
+                )),
           ),
         ),
-  );
+      );
 }
 
 class LoadingScaffold extends StatefulWidget {
@@ -214,7 +218,8 @@ class _LoadingScaffoldState extends State<LoadingScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(child: CircularWidgetLoading(
+    return Material(
+        child: CircularWidgetLoading(
       padding: EdgeInsets.zero,
       child: Scaffold(
         appBar: AppBar(title: Text('Example')),

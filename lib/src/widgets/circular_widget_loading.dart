@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:widget_loading/src/utils/loading_state.dart';
 import 'package:widget_loading/src/widgets/loading_widget.dart';
-import 'package:widget_loading/src/widgets/wiper_loading.dart';
+import 'package:widget_loading/src/widgets/widget_sized_box.dart';
 
 typedef DotBuilder = Widget Function(double radius);
 
@@ -91,7 +91,8 @@ class CircularWidgetLoading extends StatefulWidget {
   _CircularWidgetLoadingState createState() => _CircularWidgetLoadingState();
 }
 
-class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with TickerProviderStateMixin, LoadingWidgetState {
+class _CircularWidgetLoadingState extends State<CircularWidgetLoading>
+    with TickerProviderStateMixin, LoadingWidgetState {
   late AnimationController _controller;
   late AnimationController _appearingController;
   late Animation<double> _appearingAnimation;
@@ -212,7 +213,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
     Widget loadedChild = animatedSizeWidget(_childKey);
     ThemeData theme = Theme.of(context);
     Color dotColor = widget.dotColor ?? theme.accentColor;
-    TextDirection textDirection = Directionality.maybeOf(context)??TextDirection.ltr;
+    TextDirection textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
 
     Widget stack = Stack(
       children: [
@@ -224,7 +225,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
           loadedChild
         else if (appearing || disappearing)
           ClipOval(
-            clipper: DotClipper(
+            clipper: _DotClipper(
                 _appearingAnimation.value, widget.dotRadius, widget.maxLoadingCircleSize, widget.loadingCirclePadding),
             child: Stack(children: [
               Container(
@@ -262,64 +263,6 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
       ],
     );
     return Directionality(textDirection: textDirection, child: stack);
-
-    /*return Stack(
-      children: [
-        WidgetSizedBox(
-          child: animatedSizeWidget(pseudoChildKey),
-        ),
-        loaded
-            ? loadedChild
-            : Positioned.fill(
-                child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    double radius = min(widget.maxLoadingCircleSize ?? double.infinity,
-                                min(constraints.maxWidth, constraints.maxHeight)) /
-                            2 -
-                        widget.dotRadius / 2;
-                    double x = constraints.maxWidth / 2;
-                    double y = constraints.maxHeight / 2;
-
-                    double maxAppearingRadius = max(constraints.maxWidth, constraints.maxHeight) / 2;
-                    double appearingRadius =
-                        widget.dotRadius + _appearingAnimation.value * (maxAppearingRadius - widget.dotRadius);
-                    return Container(
-                      child: appearing || disappearing
-                          ? ClipOval(
-                              clipper:
-                                  CircleClipper(x + widget.dotRadius, y - radius + widget.dotRadius, appearingRadius),
-                              child: Stack(children: [
-                                loadedChild,
-                                Opacity(
-                                    opacity: 1 - appearingRadius / maxAppearingRadius,
-                                    child: Container(
-                                      width: constraints.maxWidth,
-                                      height: constraints.maxHeight,
-                                      color: widget.dotColor ?? theme.accentColor,
-                                    ))
-                              ]),
-                            )
-                          : Stack(
-                              children: <Widget>[
-                                    WidgetSizedBox(
-                                      child: loadedChild,
-                                    ),
-                                  ] +
-                                  _animations.map((e) {
-                                    double radian = 0.5 * pi - 2 * pi * e.value;
-                                    return Positioned(
-                                      child:
-                                          widget.dotBuilder?.call(widget.dotRadius) ?? loadingPoint(widget.dotRadius),
-                                      top: y - radius * sin(radian),
-                                      left: x - radius * cos(radian),
-                                    );
-                                  }).toList()),
-                    );
-                  },
-                ),
-              ),
-      ],
-    );*/
   }
 
   Widget loadingPoint(double radius) {
@@ -333,48 +276,17 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
   }
 }
 
-class CircleClipper extends CustomClipper<Rect> {
-  final double radius;
-  final double x, y;
-
-  CircleClipper(this.x, this.y, this.radius);
-
-  @override
-  Rect getClip(Size size) {
-    return Rect.fromCircle(center: Offset(x, y), radius: radius);
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) {
-    return this != oldClipper;
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CircleClipper &&
-          runtimeType == other.runtimeType &&
-          radius == other.radius &&
-          x == other.x &&
-          y == other.y;
-
-  @override
-  int get hashCode => radius.hashCode ^ x.hashCode ^ y.hashCode;
-}
-
-class DotClipper extends CustomClipper<Rect> {
+class _DotClipper extends CustomClipper<Rect> {
   final double factor;
   final double dotRadius;
   final double maxLoadingCircleSize;
   final double loadingCirclePadding;
 
-  DotClipper(this.factor, this.dotRadius, this.maxLoadingCircleSize, this.loadingCirclePadding);
+  _DotClipper(this.factor, this.dotRadius, this.maxLoadingCircleSize, this.loadingCirclePadding);
 
   @override
   Rect getClip(Size size) {
-    double radius =
-        min(maxLoadingCircleSize, min(size.width, size.height) - 2 * loadingCirclePadding) / 2 -
-            dotRadius;
+    double radius = min(maxLoadingCircleSize, min(size.width, size.height) - 2 * loadingCirclePadding) / 2 - dotRadius;
     double x = size.width / 2;
     double y = size.height / 2;
 
