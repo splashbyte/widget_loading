@@ -6,6 +6,8 @@
 [![pub points](https://badges.bar/widget_loading/pub%20points)](https://pub.dev/packages/widget_loading/score)
 <a href="https://github.com/SplashByte/widget_loading/blob/main/LICENSE"><img src="https://img.shields.io/github/license/SplashByte/widget_loading.svg" alt="license"></a>
 
+[![buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/splashbyte)
+
 ### If you like this package, please leave a like there on [pub.dev](https://pub.dev/packages/widget_loading) and star on [GitHub](https://github.com/SplashByte/widget_loading).
 
 Simple widgets for loading widget contents.
