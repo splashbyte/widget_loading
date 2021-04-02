@@ -71,56 +71,64 @@ class _ExampleState extends State<Example> {
         title: Text('Example'),
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Card(
-                  elevation: 5.0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: WiperLoading.future(
-                      minWidth: double.infinity,
-                      future: future,
+        child: ConstrainedBox(
+          // Constraints for a nicer look in web demo
+          constraints: BoxConstraints.loose(Size.fromWidth(750.0)),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Card(
+                    elevation: 5.0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: WiperLoading.future(
+                        minWidth: double.infinity,
+                        future: future,
+                      ),
                     ),
                   ),
-                ),
-                counterCard(Curves.easeInOutCirc),
-                counterCard(Curves.easeInOutCirc,
-                    builder: (width, height) => Container(
-                        width: width,
-                        height: height,
-                        decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
-                    wiperWidth: 50),
-                counterCard(
-                  Curves.linear,
-                  builder: (width, height) => Container(
-                      width: width,
-                      height: height,
-                      decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
-                  wiperWidth: 10,
-                  deformingFactor: 0.2,
-                  direction: WiperDirection.up,
-                ),
-                counterCard(Curves.easeInOutCirc, padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 30.0)),
-                counterCard(Curves.easeOutSine,
-                    builder: (width, height) => Container(
-                          width: width,
-                          height: height,
-                          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                        ),
-                    wiperWidth: 20),
-                counterCard(Curves.easeOutSine,
-                    builder: (width, height) => Container(
-                        width: width,
-                        height: height,
-                        decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
-                    wiperWidth: 20,
-                    direction: WiperDirection.left),
-                counterCardCircle(Curves.linear),
-              ],
+                  counterCard(Curves.easeInOutCirc),
+                  counterCard(Curves.easeInOutCirc,
+                      builder: (width, height) =>
+                          Container(width: width, height: height, decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
+                      wiperWidth: 50),
+                  counterCard(
+                    Curves.linear,
+                    builder: (width, height) =>
+                        Container(width: width, height: height, decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
+                    wiperWidth: 10,
+                    deformingFactor: 0.2,
+                    direction: WiperDirection.up,
+                  ),
+                  counterCard(Curves.easeInOutCirc, padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 30.0)),
+                  counterCard(Curves.easeOutSine,
+                      builder: (width, height) => Container(
+                            width: width,
+                            height: height,
+                            decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                          ),
+                      wiperWidth: 20),
+                  counterCard(Curves.easeOutSine,
+                      builder: (width, height) =>
+                          Container(width: width, height: height, decoration: BoxDecoration(color: Colors.purple, borderRadius: BorderRadius.circular(5.0))),
+                      wiperWidth: 20,
+                      direction: WiperDirection.left),
+                  counterCardCircle(Curves.linear),
+                  /*Padding(                            //web only
+                    padding: const EdgeInsets.all(8.0),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => window.open('https://flutter.dev', 'new tab'),
+                        child: Text('Made with Flutter'),
+                      ),
+                    ),
+                  ),*/
+                ],
+              ),
             ),
           ),
         ),
@@ -219,13 +227,14 @@ class _LoadingScaffoldState extends State<LoadingScaffold> {
   @override
   Widget build(BuildContext context) {
     return Material(
-        child: CircularWidgetLoading(
-      padding: EdgeInsets.zero,
-      child: Scaffold(
-        appBar: AppBar(title: Text('Example')),
-        body: Center(child: Text('Loaded!')),
+      child: CircularWidgetLoading(
+        padding: EdgeInsets.zero,
+        child: Scaffold(
+          appBar: AppBar(title: Text('Example')),
+          body: Center(child: Text('Loaded!')),
+        ),
+        loading: loading,
       ),
-      loading: loading,
-    ));
+    );
   }
 }
