@@ -13,8 +13,8 @@
 Simple widgets for loading widget contents.
 It's an easy way to hide a widget when you have nothing to show and need a loading animation at the same time.
 
-![example1](https://user-images.githubusercontent.com/43761463/109703122-66cd3480-7b95-11eb-9862-dfb45ed96b49.gif)
-![example2](https://user-images.githubusercontent.com/43761463/109703129-69c82500-7b95-11eb-8496-2b933772c8c9.gif)
+[![example1](https://user-images.githubusercontent.com/43761463/109703122-66cd3480-7b95-11eb-9862-dfb45ed96b49.gif)](https://splashbyte.dev/flutter_examples/widget_loading/index.html)
+[![example2](https://user-images.githubusercontent.com/43761463/109703129-69c82500-7b95-11eb-8496-2b933772c8c9.gif)](https://splashbyte.dev/flutter_examples/widget_loading/index.html)
 
 ## Easy Usage
 
