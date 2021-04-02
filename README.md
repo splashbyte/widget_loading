@@ -6,13 +6,15 @@
 [![pub points](https://badges.bar/widget_loading/pub%20points)](https://pub.dev/packages/widget_loading/score)
 <a href="https://github.com/SplashByte/widget_loading/blob/main/LICENSE"><img src="https://img.shields.io/github/license/SplashByte/widget_loading.svg" alt="license"></a>
 
+[![buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/splashbyte)
+
 ### If you like this package, please leave a like there on [pub.dev](https://pub.dev/packages/widget_loading) and star on [GitHub](https://github.com/SplashByte/widget_loading).
 
 Simple widgets for loading widget contents.
 It's an easy way to hide a widget when you have nothing to show and need a loading animation at the same time.
 
-![example1](https://user-images.githubusercontent.com/43761463/109703122-66cd3480-7b95-11eb-9862-dfb45ed96b49.gif)
-![example2](https://user-images.githubusercontent.com/43761463/109703129-69c82500-7b95-11eb-8496-2b933772c8c9.gif)
+[![example1](https://user-images.githubusercontent.com/43761463/109703122-66cd3480-7b95-11eb-9862-dfb45ed96b49.gif)](https://splashbyte.dev/flutter_examples/widget_loading/index.html)
+[![example2](https://user-images.githubusercontent.com/43761463/109703129-69c82500-7b95-11eb-8496-2b933772c8c9.gif)](https://splashbyte.dev/flutter_examples/widget_loading/index.html)
 
 ## Easy Usage
 

@@ -207,10 +207,12 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
             width: widget.minWidth,
             height: widget.minHeight,
           ),
-          widget.animatedSize
-              ? AnimatedSize(
-                  key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
-              : Container(key: key, child: _child),
+          IgnorePointer(
+            ignoring: !loaded,
+            child: widget.animatedSize
+                ? AnimatedSize(key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
+                : Container(key: key, child: _child),
+          ),
         ],
       );
 
@@ -261,17 +263,15 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
                     Size biggest = constraints.biggest;
                     double height = constraints.hasBoundedHeight ? biggest.height : 50;
                     double width = biggest.width;
-                    double _circleWidth = widget.wiperWidth *
-                        (1 + _animation.speed.abs() * widget.wiperDeformingFactor) *
-                        (appearing || disappearing ? 1 - _animation.value : 1);
+                    double _circleWidth =
+                        widget.wiperWidth * (1 + _animation.speed.abs() * widget.wiperDeformingFactor) * (appearing || disappearing ? 1 - _animation.value : 1);
                     /*((appearing || disappearing)
                         ? (_animation.value > 0.5
                             ? (2 * (1 - _animation.value) + 9 * pow(1 - (_animation.value), 2))
                             : (1.0 + 9 * pow(0.5 - (_animation.value - 0.5).abs(), 2)))
                         : (loaded ? 0.0 : (1.0 + 9 * pow(0.5 - (_animation.value - 0.5).abs(), 2))));*/
-                    Widget wiper =
-                        widget.wiperBuilder?.call(vertical ? width : _circleWidth, vertical ? _circleWidth : height) ??
-                            _loadingWiper(vertical ? width : _circleWidth, vertical ? _circleWidth : height, color);
+                    Widget wiper = widget.wiperBuilder?.call(vertical ? width : _circleWidth, vertical ? _circleWidth : height) ??
+                        _loadingWiper(vertical ? width : _circleWidth, vertical ? _circleWidth : height, color);
                     _pointPosition = (_animation.value * ((vertical ? height : width) - _circleWidth));
                     return Container(
                       width: width,
@@ -321,11 +321,7 @@ class _WiperRectClipper extends CustomClipper<Rect> {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _WiperRectClipper &&
-          runtimeType == other.runtimeType &&
-          direction == other.direction &&
-          factor == other.factor;
+      identical(this, other) || other is _WiperRectClipper && runtimeType == other.runtimeType && direction == other.direction && factor == other.factor;
 
   @override
   int get hashCode => direction.hashCode ^ factor.hashCode;

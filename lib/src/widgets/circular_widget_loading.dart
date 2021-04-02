@@ -79,9 +79,9 @@ class CircularWidgetLoading extends StatefulWidget {
     this.loadingCurve = Curves.easeInOutCirc,
     this.padding = const EdgeInsets.all(10.0),
     this.dotBuilder,
-    this.rollingDuration = 0.8,
+    this.rollingDuration = 1.0,
     this.dotCount = 5,
-    this.rollingFactor = 0.7,
+    this.rollingFactor = 0.875,
     this.animatedSize = true,
     this.minDotRadiusFactor = 0.5,
     this.loadingCirclePadding = 8.0,
@@ -91,8 +91,7 @@ class CircularWidgetLoading extends StatefulWidget {
   _CircularWidgetLoadingState createState() => _CircularWidgetLoadingState();
 }
 
-class _CircularWidgetLoadingState extends State<CircularWidgetLoading>
-    with TickerProviderStateMixin, LoadingWidgetState {
+class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with TickerProviderStateMixin, LoadingWidgetState {
   late AnimationController _controller;
   late AnimationController _appearingController;
   late Animation<double> _appearingAnimation;
@@ -171,8 +170,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading>
     double dif = widget.dotCount <= 1 ? 0 : widget.rollingDuration * (1 - widget.rollingFactor) / (widget.dotCount - 1);
     double singleRollingDuration = widget.rollingDuration * widget.rollingFactor;
     for (int i = 0; i < widget.dotCount; i++) {
-      _animations.add(CurvedAnimation(
-          parent: _controller, curve: Interval(i * dif, singleRollingDuration + i * dif, curve: widget.loadingCurve)));
+      _animations.add(CurvedAnimation(parent: _controller, curve: Interval(i * dif, singleRollingDuration + i * dif, curve: widget.loadingCurve)));
     }
 
     _controller.forward();
@@ -190,10 +188,11 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading>
           //Container(width: widget.minWidth, height: widget.minHeight,),
           Padding(
             padding: widget.padding,
-            child: widget.animatedSize
-                ? AnimatedSize(
-                    key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
-                : Container(key: key, child: _child),
+            child: IgnorePointer(
+                ignoring: !loaded,
+                child: widget.animatedSize
+                    ? AnimatedSize(key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
+                    : Container(key: key, child: _child)),
           ),
         ],
       );
@@ -225,23 +224,18 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading>
           loadedChild
         else if (appearing || disappearing)
           ClipOval(
-            clipper: _DotClipper(
-                _appearingAnimation.value, widget.dotRadius, widget.maxLoadingCircleSize, widget.loadingCirclePadding),
+            clipper: _DotClipper(_appearingAnimation.value, widget.dotRadius, widget.maxLoadingCircleSize, widget.loadingCirclePadding),
             child: Stack(children: [
               Container(
-                  foregroundDecoration:
-                      BoxDecoration(color: dotColor.withOpacity(dotColor.opacity * (1 - _appearingAnimation.value))),
-                  child: loadedChild)
+                  foregroundDecoration: BoxDecoration(color: dotColor.withOpacity(dotColor.opacity * (1 - _appearingAnimation.value))), child: loadedChild)
             ]),
           )
         else
           Positioned.fill(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-                double radius = min(widget.maxLoadingCircleSize,
-                            min(constraints.maxWidth, constraints.maxHeight) - 2 * widget.loadingCirclePadding) /
-                        2 -
-                    widget.dotRadius;
+                double radius =
+                    min(widget.maxLoadingCircleSize, min(constraints.maxWidth, constraints.maxHeight) - 2 * widget.loadingCirclePadding) / 2 - widget.dotRadius;
                 double x = constraints.maxWidth / 2;
                 double y = constraints.maxHeight / 2;
 
@@ -249,8 +243,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading>
                     children: List.generate(_animations.length, (index) => index).map((i) {
                   Animation animation = _animations[i];
                   double radian = 0.5 * pi - 2 * pi * animation.value;
-                  double dotRadius = widget.dotRadius *
-                      (widget.minDotRadiusFactor + (1 - widget.minDotRadiusFactor) * (1 - i / _animations.length));
+                  double dotRadius = widget.dotRadius * (widget.minDotRadiusFactor + (1 - widget.minDotRadiusFactor) * (1 - i / _animations.length));
                   return Positioned(
                     child: widget.dotBuilder?.call(widget.dotRadius) ?? loadingPoint(dotRadius),
                     top: y - radius * sin(radian) - dotRadius,
@@ -269,9 +262,7 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading>
     return Container(
       width: radius * 2,
       height: radius * 2,
-      decoration: BoxDecoration(
-          color: widget.dotColor ?? Theme.of(context).accentColor,
-          borderRadius: BorderRadius.all(Radius.circular(radius))),
+      decoration: BoxDecoration(color: widget.dotColor ?? Theme.of(context).accentColor, borderRadius: BorderRadius.all(Radius.circular(radius))),
     );
   }
 }
