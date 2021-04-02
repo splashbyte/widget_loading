@@ -1,3 +1,7 @@
+## [0.2.1] - (2021-04-02)
+
+- Minor Changes/Fixes
+
 ## [0.2.0] - (2021-03-04)
 
 - Migrates to null safety

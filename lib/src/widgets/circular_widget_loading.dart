@@ -79,9 +79,9 @@ class CircularWidgetLoading extends StatefulWidget {
     this.loadingCurve = Curves.easeInOutCirc,
     this.padding = const EdgeInsets.all(10.0),
     this.dotBuilder,
-    this.rollingDuration = 0.8,
+    this.rollingDuration = 1.0,
     this.dotCount = 5,
-    this.rollingFactor = 0.7,
+    this.rollingFactor = 0.9,
     this.animatedSize = true,
     this.minDotRadiusFactor = 0.5,
     this.loadingCirclePadding = 8.0,
@@ -190,10 +190,10 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading>
           //Container(width: widget.minWidth, height: widget.minHeight,),
           Padding(
             padding: widget.padding,
-            child: widget.animatedSize
+            child: IgnorePointer(ignoring: !loaded, child: widget.animatedSize
                 ? AnimatedSize(
                     key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
-                : Container(key: key, child: _child),
+                : Container(key: key, child: _child)),
           ),
         ],
       );

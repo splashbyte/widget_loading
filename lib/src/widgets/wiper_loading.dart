@@ -207,10 +207,13 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
             width: widget.minWidth,
             height: widget.minHeight,
           ),
-          widget.animatedSize
-              ? AnimatedSize(
-                  key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
-              : Container(key: key, child: _child),
+          IgnorePointer(
+            ignoring: !loaded,
+            child: widget.animatedSize
+                ? AnimatedSize(
+                    key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
+                : Container(key: key, child: _child),
+          ),
         ],
       );
 
