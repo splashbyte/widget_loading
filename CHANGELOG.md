@@ -1,5 +1,9 @@
 ## [0.2.1] - (2021-04-02)
 
+- Minor Fixes
+
+## [0.2.1] - (2021-04-02)
+
 - Minor Changes/Fixes
 - Changes default values of CircularWidgetLoading
 

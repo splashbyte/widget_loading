@@ -109,8 +109,6 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
     assert(widget.rollingFactor >= 0 && widget.rollingFactor <= 1);
     assert(widget.minDotRadiusFactor >= 0 && widget.minDotRadiusFactor <= 1);
 
-    loadingState = widget.loading ? LoadingState.LOADING : LoadingState.LOADED;
-
     _child = widget.child;
 
     _appearingController = AnimationController(
@@ -173,7 +171,9 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
       _animations.add(CurvedAnimation(parent: _controller, curve: Interval(i * dif, singleRollingDuration + i * dif, curve: widget.loadingCurve)));
     }
 
-    _controller.forward();
+    loadingState = widget.loading ? LoadingState.LOADING : LoadingState.LOADED;
+    if(loading) _controller.forward();
+    else _appearingController.value = 1.0;
   }
 
   @override

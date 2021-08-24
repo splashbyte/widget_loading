@@ -176,6 +176,8 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
             break;
         }
       });
+
+    if(loaded) _controller.value = 1.0;
   }
 
   @override
