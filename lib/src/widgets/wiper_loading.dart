@@ -145,10 +145,6 @@ class _WiperLoadingState extends LoadingWidgetState<WiperLoading>
     )..repeat(reverse: true);
 
     _animation = CurvedAnimation(parent: _controller, curve: widget.curve)
-      ..addListener(() {
-        if (loaded) return;
-        setState(() {});
-      })
       ..addStatusListener((status) {
         switch (status) {
           case AnimationStatus.forward:
@@ -243,6 +239,9 @@ class _WiperLoadingState extends LoadingWidgetState<WiperLoading>
       setLoadingState(LoadingState.DISAPPEARING, rebuild: false);
       _controller.animateBack(0.0);
     }
+
+    _controller.duration = widget.interval;
+    _animation.curve = widget.curve;
   }
 
   @override
