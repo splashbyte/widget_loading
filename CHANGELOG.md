@@ -1,13 +1,17 @@
+## 0.3.1 (2022-03-18)
+
+- Minor fixes
+
 ## 0.3.0 (2022-03-18)
 
-- Several minor Fixes
+- Several minor fixes
 - Performance improvements  
 - BREAKING: Changes default value of `padding` to `EdgeInsets.zero`
 - BREAKING: Changes default color to `Theme.of(context).colorScheme.secondary`
 
 ## 0.2.1 (2021-04-02)
 
-- Minor Changes/Fixes
+- Minor changes/fixes
 - Changes default values of `CircularWidgetLoading`
 
 ## 0.2.0 (2021-03-04)
