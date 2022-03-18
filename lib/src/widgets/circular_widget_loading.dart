@@ -117,8 +117,7 @@ class _CircularWidgetLoadingState
     _appearingController = AnimationController(
       duration: widget.appearingDuration,
       vsync: this,
-    )
-      ..addStatusListener((status) {
+    )..addStatusListener((status) {
         switch (status) {
           case AnimationStatus.dismissed:
             if (disappearing) {
@@ -136,13 +135,13 @@ class _CircularWidgetLoadingState
         }
       });
 
-    _appearingAnimation = CurvedAnimation(parent: _appearingController, curve: widget.appearingCurve);
+    _appearingAnimation = CurvedAnimation(
+        parent: _appearingController, curve: widget.appearingCurve);
 
     _controller = AnimationController(
       duration: widget.loadingDuration,
       vsync: this,
-    )
-      ..addStatusListener((status) {
+    )..addStatusListener((status) {
         switch (status) {
           case AnimationStatus.forward:
             break;
@@ -332,17 +331,23 @@ class _DotClipper extends CustomClipper<Rect> {
   final double maxLoadingCircleSize;
   final double loadingCirclePadding;
 
-  _DotClipper(this.factor, this.dotRadius, this.maxLoadingCircleSize, this.loadingCirclePadding);
+  _DotClipper(this.factor, this.dotRadius, this.maxLoadingCircleSize,
+      this.loadingCirclePadding);
 
   @override
   Rect getClip(Size size) {
-    double radius = min(maxLoadingCircleSize, min(size.width, size.height) - 2 * loadingCirclePadding) / 2 - dotRadius;
+    double radius = min(maxLoadingCircleSize,
+                min(size.width, size.height) - 2 * loadingCirclePadding) /
+            2 -
+        dotRadius;
     double x = size.width / 2;
     double y = size.height / 2;
 
     double maxAppearingRadius = sqrt(x * x + y * y);
-    double appearingRadius = dotRadius + factor * (maxAppearingRadius - dotRadius);
-    return Rect.fromCircle(center: Offset(x, y - radius), radius: appearingRadius);
+    double appearingRadius =
+        dotRadius + factor * (maxAppearingRadius - dotRadius);
+    return Rect.fromCircle(
+        center: Offset(x, y - radius), radius: appearingRadius);
   }
 
   @override

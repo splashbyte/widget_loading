@@ -11,11 +11,13 @@ extension Derivation on CurvedAnimation {
       case AnimationStatus.forward:
         double value = max(this.parent.value - dif, 0.0);
         if (value == this.parent.value) return 0.0;
-        return (this.value - this.curve.transform(value)) / (this.parent.value - value);
+        return (this.value - this.curve.transform(value)) /
+            (this.parent.value - value);
       case AnimationStatus.reverse:
         double value = min(this.parent.value + dif, 1.0);
         if (value == this.parent.value) return 0.0;
-        return (this.value - this.curve.transform(value)) / (value - this.parent.value);
+        return (this.value - this.curve.transform(value)) /
+            (value - this.parent.value);
       case AnimationStatus.dismissed:
       case AnimationStatus.completed:
         break;

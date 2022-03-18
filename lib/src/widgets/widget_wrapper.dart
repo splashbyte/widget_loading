@@ -23,4 +23,3 @@ class WidgetWrapper extends StatelessWidget {
     return child;
   }
 }
-

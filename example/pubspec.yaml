@@ -1,19 +1,19 @@
 name: example
 description: Example Project for the package widget_loading.
 
+publish_to: 'none'
+
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.12.0-259.16.beta <3.0.0"
+  sdk: ">=2.15.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
   widget_loading:
-    path: ../
-
-  cupertino_icons: ^1.0.0
+    path: '..'
 
 dev_dependencies:
   flutter_test:

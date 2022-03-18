@@ -179,7 +179,7 @@ class _WiperLoadingState extends LoadingWidgetState<WiperLoading>
         }
       });
 
-    if(loaded) _controller.value = 1.0;
+    if (loaded) _controller.value = 1.0;
   }
 
   @override
@@ -331,11 +331,13 @@ class _WiperRectClipper extends CustomClipper<Rect> {
   @override
   Rect getClip(Size size) {
     return direction == WiperDirection.left
-        ? Rect.fromLTWH(size.width * (1 - factor), 0, size.width * factor, size.height)
+        ? Rect.fromLTWH(
+            size.width * (1 - factor), 0, size.width * factor, size.height)
         : direction == WiperDirection.right
             ? Rect.fromLTWH(0, 0, size.width * factor, size.height)
             : direction == WiperDirection.up
-                ? Rect.fromLTWH(0, size.height * (1 - factor), size.width, size.height * factor)
+                ? Rect.fromLTWH(0, size.height * (1 - factor), size.width,
+                    size.height * factor)
                 : Rect.fromLTWH(0, 0, size.width, size.height * factor);
   }
 
@@ -346,7 +348,11 @@ class _WiperRectClipper extends CustomClipper<Rect> {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is _WiperRectClipper && runtimeType == other.runtimeType && direction == other.direction && factor == other.factor;
+      identical(this, other) ||
+      other is _WiperRectClipper &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction &&
+          factor == other.factor;
 
   @override
   int get hashCode => direction.hashCode ^ factor.hashCode;

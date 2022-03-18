@@ -54,9 +54,9 @@ abstract class LoadingWidgetState<T extends StatefulWidget> extends State<T> {
     setLoadingState(value);
   }
 
-  void setLoadingState(LoadingState value, {bool rebuild = true}){
+  void setLoadingState(LoadingState value, {bool rebuild = true}) {
     _loadingState = value;
-    if(rebuild && mounted) setState((){});
+    if (rebuild && mounted) setState(() {});
   }
 
   LoadingState get loadingState => _loadingState;
