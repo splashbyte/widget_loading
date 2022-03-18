@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:widget_loading/src/utils/extensions.dart';
 import 'package:widget_loading/src/utils/loading_state.dart';
-import 'package:widget_loading/src/widgets/widget_sized_box.dart';
+import 'package:widget_loading/src/widgets/widget_wrapper.dart';
 
 import 'loading_widget.dart';
 
@@ -121,9 +120,11 @@ class WiperLoading extends StatefulWidget {
   _WiperLoadingState createState() => _WiperLoadingState();
 }
 
-class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMixin, LoadingWidgetState {
+class _WiperLoadingState extends LoadingWidgetState<WiperLoading>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final CurvedAnimation _animation;
+  final _animatedSizeKey = GlobalKey();
   double _pointPosition = 0;
   late Widget _child;
 
@@ -135,7 +136,8 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
 
     _child = widget.child;
 
-    loadingState = widget.loading ? LoadingState.LOADING : LoadingState.LOADED;
+    setLoadingState(widget.loading ? LoadingState.LOADING : LoadingState.LOADED,
+        rebuild: false);
 
     _controller = AnimationController(
       duration: widget.interval,
@@ -176,6 +178,8 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
             break;
         }
       });
+
+    if (loaded) _controller.value = 1.0;
   }
 
   @override
@@ -192,7 +196,8 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
         margin: EdgeInsets.zero,
         color: color,
         elevation: 5.0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(min(width, height))),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(min(width, height))),
         child: Container(
           width: width,
           height: height,
@@ -201,20 +206,27 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
     );
   }
 
-  Widget animatedSizeWidget(Key key) => Stack(
-        children: [
-          Container(
-            width: widget.minWidth,
-            height: widget.minHeight,
-          ),
-          IgnorePointer(
-            ignoring: !loaded,
-            child: widget.animatedSize
-                ? AnimatedSize(key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
-                : Container(key: key, child: _child),
-          ),
-        ],
-      );
+  Widget animatedSizeWidget(Key key) {
+    final wrappedChild = WidgetWrapper(key: _childKey, child: _child);
+    return Stack(
+      children: [
+        SizedBox(
+          width: widget.minWidth,
+          height: widget.minHeight,
+        ),
+        IgnorePointer(
+          ignoring: !loaded,
+          child: widget.animatedSize
+              ? AnimatedSize(
+                  key: _animatedSizeKey,
+                  duration: widget.sizeDuration,
+                  curve: widget.sizeCurve,
+                  child: wrappedChild)
+              : wrappedChild,
+        ),
+      ],
+    );
+  }
 
   bool get up => widget.direction == WiperDirection.up;
 
@@ -225,55 +237,65 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
   bool get left => widget.direction == WiperDirection.left;
 
   @override
-  Widget build(BuildContext context) {
+  void didUpdateWidget(covariant WiperLoading oldWidget) {
+    super.didUpdateWidget(oldWidget);
     if (loaded && widget.loading) {
-      loadingState = LoadingState.DISAPPEARING;
+      setLoadingState(LoadingState.DISAPPEARING, rebuild: false);
       _controller.animateBack(0.0);
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     if (!disappearing) _child = widget.child;
 
     Widget _loadedChild = animatedSizeWidget(_childKey);
-    Color color = widget.wiperColor ?? Theme.of(context).accentColor;
+    Color color = widget.wiperColor ?? Theme.of(context).colorScheme.secondary;
 
     bool vertical = up || down;
-    TextDirection textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
+    TextDirection textDirection =
+        Directionality.maybeOf(context) ?? TextDirection.ltr;
 
     Widget stack = Stack(
       children: [
-        //WidgetSizedBox(child: animatedSizeWidget(pseudoChildKey),),
-        Container(
-          width: widget.minWidth,
-          height: widget.minHeight,
-        ),
-        if (!loaded)
+        if (loaded)
+          _loadedChild
+        else ...[
           appearing || disappearing
-              ? ClipRect(
-                  clipper: _WiperRectClipper(widget.direction, _animation.value),
-                  child: _loadedChild,
+              ? AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) => ClipRect(
+                    clipper:
+                        _WiperRectClipper(widget.direction, _animation.value),
+                    child: _loadedChild,
+                  ),
                 )
               : WidgetSizedBox(
                   child: _loadedChild,
                 ),
-        loaded
-            ? _loadedChild
-            : Positioned.fill(
-                child: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    Size biggest = constraints.biggest;
-                    double height = constraints.hasBoundedHeight ? biggest.height : 50;
-                    double width = biggest.width;
-                    double _circleWidth =
-                        widget.wiperWidth * (1 + _animation.speed.abs() * widget.wiperDeformingFactor) * (appearing || disappearing ? 1 - _animation.value : 1);
-                    /*((appearing || disappearing)
-                        ? (_animation.value > 0.5
-                            ? (2 * (1 - _animation.value) + 9 * pow(1 - (_animation.value), 2))
-                            : (1.0 + 9 * pow(0.5 - (_animation.value - 0.5).abs(), 2)))
-                        : (loaded ? 0.0 : (1.0 + 9 * pow(0.5 - (_animation.value - 0.5).abs(), 2))));*/
-                    Widget wiper = widget.wiperBuilder?.call(vertical ? width : _circleWidth, vertical ? _circleWidth : height) ??
-                        _loadingWiper(vertical ? width : _circleWidth, vertical ? _circleWidth : height, color);
-                    _pointPosition = (_animation.value * ((vertical ? height : width) - _circleWidth));
-                    return Container(
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                Size biggest = constraints.biggest;
+                double height =
+                    constraints.hasBoundedHeight ? biggest.height : 50;
+                double width = biggest.width;
+                return AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    double _circleWidth = widget.wiperWidth *
+                        (1 +
+                            _animation.speed.abs() *
+                                widget.wiperDeformingFactor) *
+                        (appearing || disappearing ? 1 - _animation.value : 1);
+                    Widget wiper = widget.wiperBuilder?.call(
+                            vertical ? width : _circleWidth,
+                            vertical ? _circleWidth : height) ??
+                        _loadingWiper(vertical ? width : _circleWidth,
+                            vertical ? _circleWidth : height, color);
+                    _pointPosition = (_animation.value *
+                        ((vertical ? height : width) - _circleWidth));
+                    return SizedBox(
                       width: width,
                       height: height,
                       child: Stack(
@@ -289,8 +311,11 @@ class _WiperLoadingState extends State<WiperLoading> with TickerProviderStateMix
                       ),
                     );
                   },
-                ),
-              ),
+                );
+              },
+            ),
+          ),
+        ],
       ],
     );
     return Directionality(textDirection: textDirection, child: stack);
@@ -306,11 +331,13 @@ class _WiperRectClipper extends CustomClipper<Rect> {
   @override
   Rect getClip(Size size) {
     return direction == WiperDirection.left
-        ? Rect.fromLTWH(size.width * (1 - factor), 0, size.width * factor, size.height)
+        ? Rect.fromLTWH(
+            size.width * (1 - factor), 0, size.width * factor, size.height)
         : direction == WiperDirection.right
             ? Rect.fromLTWH(0, 0, size.width * factor, size.height)
             : direction == WiperDirection.up
-                ? Rect.fromLTWH(0, size.height * (1 - factor), size.width, size.height * factor)
+                ? Rect.fromLTWH(0, size.height * (1 - factor), size.width,
+                    size.height * factor)
                 : Rect.fromLTWH(0, 0, size.width, size.height * factor);
   }
 
@@ -321,7 +348,11 @@ class _WiperRectClipper extends CustomClipper<Rect> {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is _WiperRectClipper && runtimeType == other.runtimeType && direction == other.direction && factor == other.factor;
+      identical(this, other) ||
+      other is _WiperRectClipper &&
+          runtimeType == other.runtimeType &&
+          direction == other.direction &&
+          factor == other.factor;
 
   @override
   int get hashCode => direction.hashCode ^ factor.hashCode;
