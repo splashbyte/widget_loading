@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:widget_loading/src/utils/loading_state.dart';
 import 'package:widget_loading/src/widgets/loading_widget.dart';
-import 'package:widget_loading/src/widgets/widget_sized_box.dart';
+import 'package:widget_loading/src/widgets/widget_wrapper.dart';
 
 typedef DotBuilder = Widget Function(double radius);
 
@@ -77,7 +77,7 @@ class CircularWidgetLoading extends StatefulWidget {
     this.loadingDuration = const Duration(milliseconds: 2000),
     this.appearingCurve = Curves.fastOutSlowIn,
     this.loadingCurve = Curves.easeInOutCirc,
-    this.padding = const EdgeInsets.all(10.0),
+    this.padding = EdgeInsets.zero,
     this.dotBuilder,
     this.rollingDuration = 1.0,
     this.dotCount = 5,
@@ -91,15 +91,18 @@ class CircularWidgetLoading extends StatefulWidget {
   _CircularWidgetLoadingState createState() => _CircularWidgetLoadingState();
 }
 
-class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with TickerProviderStateMixin, LoadingWidgetState {
+class _CircularWidgetLoadingState
+    extends LoadingWidgetState<CircularWidgetLoading>
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late AnimationController _appearingController;
-  late Animation<double> _appearingAnimation;
-  List<Animation<double>> _animations = [];
+  late CurvedAnimation _appearingAnimation;
+  List<CurvedAnimation> _animations = [];
 
   final _childKey = GlobalKey();
+  final _animatedSizeKey = GlobalKey();
 
-  Widget _child = Container();
+  Widget _child = SizedBox();
 
   @override
   void initState() {
@@ -115,10 +118,6 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
       duration: widget.appearingDuration,
       vsync: this,
     )
-      ..addListener(() {
-        if (!appearing && !disappearing) return;
-        setState(() {});
-      })
       ..addStatusListener((status) {
         switch (status) {
           case AnimationStatus.dismissed:
@@ -143,10 +142,6 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
       duration: widget.loadingDuration,
       vsync: this,
     )
-      ..addListener(() {
-        if (!loading) return;
-        setState(() {});
-      })
       ..addStatusListener((status) {
         switch (status) {
           case AnimationStatus.forward:
@@ -159,21 +154,42 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
             if (!widget.loading && loading) {
               loadingState = LoadingState.APPEARING;
               _appearingController.forward(from: 0.0);
-            } else
-              WidgetsBinding.instance?.addPostFrameCallback((_) => _controller.forward(from: 0.0));
+            } else {
+              _controller.forward(from: 0.0);
+            }
             break;
         }
       });
 
-    double dif = widget.dotCount <= 1 ? 0 : widget.rollingDuration * (1 - widget.rollingFactor) / (widget.dotCount - 1);
-    double singleRollingDuration = widget.rollingDuration * widget.rollingFactor;
-    for (int i = 0; i < widget.dotCount; i++) {
-      _animations.add(CurvedAnimation(parent: _controller, curve: Interval(i * dif, singleRollingDuration + i * dif, curve: widget.loadingCurve)));
-    }
+    _generateDotAnimations();
+    _setDotCurves();
 
-    loadingState = widget.loading ? LoadingState.LOADING : LoadingState.LOADED;
-    if(loading) _controller.forward();
-    else _appearingController.value = 1.0;
+    setLoadingState(widget.loading ? LoadingState.LOADING : LoadingState.LOADED,
+        rebuild: false);
+    if (loading)
+      _controller.forward();
+    else
+      _appearingController.value = 1.0;
+  }
+
+  void _generateDotAnimations() {
+    _animations.forEach((a) => a.dispose());
+    _animations = List.generate(widget.dotCount,
+        (index) => CurvedAnimation(parent: _controller, curve: Curves.linear));
+  }
+
+  void _setDotCurves() {
+    double dif = _animations.length <= 1
+        ? 0
+        : widget.rollingDuration *
+            (1 - widget.rollingFactor) /
+            (_animations.length - 1);
+    double singleRollingDuration =
+        widget.rollingDuration * widget.rollingFactor;
+    for (int i = 0; i < _animations.length; i++) {
+      _animations[i].curve = Interval(i * dif, singleRollingDuration + i * dif,
+          curve: widget.loadingCurve);
+    }
   }
 
   @override
@@ -183,86 +199,129 @@ class _CircularWidgetLoadingState extends State<CircularWidgetLoading> with Tick
     super.dispose();
   }
 
-  Widget animatedSizeWidget(Key key) => Stack(
-        children: [
-          //Container(width: widget.minWidth, height: widget.minHeight,),
-          Padding(
-            padding: widget.padding,
-            child: IgnorePointer(
-                ignoring: !loaded,
-                child: widget.animatedSize
-                    ? AnimatedSize(key: key, duration: widget.sizeDuration, vsync: this, curve: widget.sizeCurve, child: _child)
-                    : Container(key: key, child: _child)),
-          ),
-        ],
-      );
+  Widget get _animatedSizeWidget {
+    final wrappedChild = WidgetWrapper(key: _childKey, child: _child);
+
+    return Padding(
+      padding: widget.padding,
+      child: IgnorePointer(
+          ignoring: !loaded,
+          child: widget.animatedSize
+              ? AnimatedSize(
+                  key: _animatedSizeKey,
+                  duration: widget.sizeDuration,
+                  curve: widget.sizeCurve,
+                  child: wrappedChild)
+              : wrappedChild),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant CircularWidgetLoading oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_animations.length != widget.dotCount) _generateDotAnimations();
+    if (_animations.length != widget.dotCount ||
+        oldWidget.rollingFactor != widget.rollingFactor ||
+        oldWidget.rollingDuration != widget.rollingFactor ||
+        oldWidget.loadingCurve != widget.loadingCurve) _setDotCurves();
+
+    _appearingController.duration = widget.appearingDuration;
+    _appearingAnimation.curve = widget.appearingCurve;
+    _controller.duration = widget.loadingDuration;
+
+    if ((loaded || appearing) && widget.loading) {
+      setLoadingState(LoadingState.DISAPPEARING, rebuild: false);
+      _appearingController.reverse();
+    } else if (disappearing && !widget.loading) {
+      setLoadingState(LoadingState.APPEARING, rebuild: false);
+      _appearingController.forward();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if ((loaded || appearing) && widget.loading) {
-      loadingState = LoadingState.DISAPPEARING;
-      _appearingController.reverse();
-    } else if (disappearing && !widget.loading) {
-      loadingState = LoadingState.APPEARING;
-      _appearingController.forward();
-    }
-
     if (!disappearing) _child = widget.child;
-
-    Widget loadedChild = animatedSizeWidget(_childKey);
     ThemeData theme = Theme.of(context);
-    Color dotColor = widget.dotColor ?? theme.accentColor;
-    TextDirection textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
+    Widget loadedChild = _animatedSizeWidget;
+    Color dotColor = widget.dotColor ?? theme.colorScheme.secondary;
+    TextDirection textDirection =
+        Directionality.maybeOf(context) ?? TextDirection.ltr;
 
     Widget stack = Stack(
       children: [
-        if (loading)
+        if (loading) ...[
           WidgetSizedBox(
             child: loadedChild,
           ),
-        if (loaded)
-          loadedChild
-        else if (appearing || disappearing)
-          ClipOval(
-            clipper: _DotClipper(_appearingAnimation.value, widget.dotRadius, widget.maxLoadingCircleSize, widget.loadingCirclePadding),
-            child: Stack(children: [
-              Container(
-                  foregroundDecoration: BoxDecoration(color: dotColor.withOpacity(dotColor.opacity * (1 - _appearingAnimation.value))), child: loadedChild)
-            ]),
-          )
-        else
           Positioned.fill(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-                double radius =
-                    min(widget.maxLoadingCircleSize, min(constraints.maxWidth, constraints.maxHeight) - 2 * widget.loadingCirclePadding) / 2 - widget.dotRadius;
+                double radius = min(
+                            widget.maxLoadingCircleSize,
+                            min(constraints.maxWidth, constraints.maxHeight) -
+                                2 * widget.loadingCirclePadding) /
+                        2 -
+                    widget.dotRadius;
                 double x = constraints.maxWidth / 2;
                 double y = constraints.maxHeight / 2;
 
                 return Stack(
-                    children: List.generate(_animations.length, (index) => index).map((i) {
+                    children:
+                        List.generate(_animations.length, (index) => index)
+                            .map((i) {
                   Animation animation = _animations[i];
-                  double radian = 0.5 * pi - 2 * pi * animation.value;
-                  double dotRadius = widget.dotRadius * (widget.minDotRadiusFactor + (1 - widget.minDotRadiusFactor) * (1 - i / _animations.length));
-                  return Positioned(
-                    child: widget.dotBuilder?.call(widget.dotRadius) ?? loadingPoint(dotRadius),
-                    top: y - radius * sin(radian) - dotRadius,
-                    left: x - radius * cos(radian) - dotRadius,
-                  );
+                  double dotRadius = widget.dotRadius *
+                      (widget.minDotRadiusFactor +
+                          (1 - widget.minDotRadiusFactor) *
+                              (1 - i / _animations.length));
+                  return AnimatedBuilder(
+                      animation: animation,
+                      child: widget.dotBuilder?.call(widget.dotRadius) ??
+                          loadingPoint(dotRadius, dotColor),
+                      builder: (context, child) {
+                        double radian = 0.5 * pi - 2 * pi * animation.value;
+                        return Positioned(
+                          child: child!,
+                          top: y - radius * sin(radian) - dotRadius,
+                          left: x - radius * cos(radian) - dotRadius,
+                        );
+                      });
                 }).toList());
               },
             ),
           ),
+        ] else if (loaded)
+          loadedChild
+        else
+          AnimatedBuilder(
+            animation: _appearingAnimation,
+            builder: (context, child) => ClipOval(
+              clipper: _DotClipper(_appearingAnimation.value, widget.dotRadius,
+                  widget.maxLoadingCircleSize, widget.loadingCirclePadding),
+              child: Stack(children: [
+                DecoratedBox(
+                    position: DecorationPosition.foreground,
+                    decoration: BoxDecoration(
+                        color: dotColor.withOpacity(dotColor.opacity *
+                            (1 - _appearingAnimation.value))),
+                    child: loadedChild)
+              ]),
+            ),
+          )
       ],
     );
     return Directionality(textDirection: textDirection, child: stack);
   }
 
-  Widget loadingPoint(double radius) {
+  Widget loadingPoint(double radius, Color color) {
     return Container(
       width: radius * 2,
       height: radius * 2,
-      decoration: BoxDecoration(color: widget.dotColor ?? Theme.of(context).accentColor, borderRadius: BorderRadius.all(Radius.circular(radius))),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.all(Radius.circular(radius)),
+      ),
     );
   }
 }

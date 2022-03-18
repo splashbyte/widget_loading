@@ -1,6 +1,6 @@
 name: widget_loading
 description: An easy way to hide a widget when you have nothing to show yet and need a loading animation at the same time.
-version: 0.2.2
+version: 0.3.0
 repository: https://github.com/SplashByte/widget_loading
 
 environment:

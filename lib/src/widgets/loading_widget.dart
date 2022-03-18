@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:widget_loading/src/utils/loading_state.dart';
 
+// unused because of problems with documentation of constructor parameters
 abstract class LoadingWidget extends StatefulWidget {
   final Widget child;
 
@@ -46,12 +47,19 @@ abstract class LoadingWidget extends StatefulWidget {
       : super(key: key);
 }
 
-abstract class LoadingWidgetState {
+abstract class LoadingWidgetState<T extends StatefulWidget> extends State<T> {
   LoadingState _loadingState = LoadingState.LOADED;
 
   set loadingState(LoadingState value) {
-    _loadingState = value;
+    setLoadingState(value);
   }
+
+  void setLoadingState(LoadingState value, {bool rebuild = true}){
+    _loadingState = value;
+    if(rebuild && mounted) setState((){});
+  }
+
+  LoadingState get loadingState => _loadingState;
 
   bool get disappearing => _loadingState == LoadingState.DISAPPEARING;
 
