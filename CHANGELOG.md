@@ -1,3 +1,8 @@
+## 0.3.2 (2022-06-13)
+
+- Minor fixes
+- Upgrade to Flutter 3.0
+
 ## 0.3.1 (2022-03-18)
 
 - Minor fixes

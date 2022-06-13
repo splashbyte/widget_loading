@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:widget_loading/src/utils/clip.dart';
 import 'package:widget_loading/src/utils/loading_state.dart';
 import 'package:widget_loading/src/widgets/loading_widget.dart';
 import 'package:widget_loading/src/widgets/widget_wrapper.dart';
@@ -296,7 +297,7 @@ class _CircularWidgetLoadingState
           AnimatedBuilder(
             animation: _appearingAnimation,
             builder: (context, child) => ClipOval(
-              clipper: _DotClipper(_appearingAnimation.value, widget.dotRadius,
+              clipper: DotClipper(_appearingAnimation.value, widget.dotRadius,
                   widget.maxLoadingCircleSize, widget.loadingCirclePadding),
               child: Stack(children: [
                 DecoratedBox(
@@ -322,36 +323,5 @@ class _CircularWidgetLoadingState
         borderRadius: BorderRadius.all(Radius.circular(radius)),
       ),
     );
-  }
-}
-
-class _DotClipper extends CustomClipper<Rect> {
-  final double factor;
-  final double dotRadius;
-  final double maxLoadingCircleSize;
-  final double loadingCirclePadding;
-
-  _DotClipper(this.factor, this.dotRadius, this.maxLoadingCircleSize,
-      this.loadingCirclePadding);
-
-  @override
-  Rect getClip(Size size) {
-    double radius = min(maxLoadingCircleSize,
-                min(size.width, size.height) - 2 * loadingCirclePadding) /
-            2 -
-        dotRadius;
-    double x = size.width / 2;
-    double y = size.height / 2;
-
-    double maxAppearingRadius = sqrt(x * x + y * y);
-    double appearingRadius =
-        dotRadius + factor * (maxAppearingRadius - dotRadius);
-    return Rect.fromCircle(
-        center: Offset(x, y - radius), radius: appearingRadius);
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) {
-    return this != oldClipper;
   }
 }

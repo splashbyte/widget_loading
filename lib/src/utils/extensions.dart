@@ -1,5 +1,6 @@
 import 'dart:math';
-import 'package:flutter/animation.dart';
+
+import 'package:flutter/material.dart';
 
 extension Derivation on CurvedAnimation {
   /// Returns the current speed/derivation of the Curve.
@@ -25,4 +26,9 @@ extension Derivation on CurvedAnimation {
 
     return 0.0;
   }
+}
+
+extension Diagonal on Size {
+  double get diagonal =>
+      sqrt(this.width * this.width + this.height * this.height);
 }

@@ -150,7 +150,7 @@ class _WiperLoadingState extends LoadingWidgetState<WiperLoading>
           case AnimationStatus.forward:
             if (!widget.loading && loading && !appearing) {
               loadingState = LoadingState.APPEARING;
-              WidgetsBinding.instance?.addPostFrameCallback((_) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
                 _controller.animateTo(1.0);
               });
             }
@@ -158,7 +158,7 @@ class _WiperLoadingState extends LoadingWidgetState<WiperLoading>
           case AnimationStatus.reverse:
             if (widget.loading && !loading && !disappearing) {
               loadingState = LoadingState.DISAPPEARING;
-              WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+              WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
                 _controller.animateBack(0.0);
               });
             }
