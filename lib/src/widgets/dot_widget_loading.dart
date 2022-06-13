@@ -245,8 +245,10 @@ class _DotWidgetLoadingState extends LoadingWidgetState<DotWidgetLoading>
                     : PathDotClipper(1.0 - _appearingAnimation.value),
                 child: DecoratedBox(
                     decoration: BoxDecoration(
-                        color: appearing ? Colors.transparent : dotColor.withOpacity(dotColor.opacity *
-                            (_appearingAnimation.value))),
+                        color: appearing
+                            ? Colors.transparent
+                            : dotColor.withOpacity(dotColor.opacity *
+                                (_appearingAnimation.value))),
                     child: child),
               ),
             ),

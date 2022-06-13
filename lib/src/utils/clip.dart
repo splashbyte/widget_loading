@@ -15,8 +15,8 @@ class DotClipper extends CustomClipper<Rect> {
   @override
   Rect getClip(Size size) {
     double radius = min(maxLoadingCircleSize,
-        min(size.width, size.height) - 2 * loadingCirclePadding) /
-        2 -
+                min(size.width, size.height) - 2 * loadingCirclePadding) /
+            2 -
         dotRadius;
     double x = size.width / 2;
     double y = size.height / 2;
@@ -56,9 +56,9 @@ class PathDotClipper extends CustomClipper<Path> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is InvertedDotClipper &&
-              runtimeType == other.runtimeType &&
-              radiusFactor == other.radiusFactor;
+      other is InvertedDotClipper &&
+          runtimeType == other.runtimeType &&
+          radiusFactor == other.radiusFactor;
 
   @override
   int get hashCode => radiusFactor.hashCode;
@@ -87,9 +87,9 @@ class InvertedDotClipper extends CustomClipper<Path> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is InvertedDotClipper &&
-              runtimeType == other.runtimeType &&
-              radiusFactor == other.radiusFactor;
+      other is InvertedDotClipper &&
+          runtimeType == other.runtimeType &&
+          radiusFactor == other.radiusFactor;
 
   @override
   int get hashCode => radiusFactor.hashCode;
