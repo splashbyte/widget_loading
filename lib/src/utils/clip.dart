@@ -25,7 +25,9 @@ class DotClipper extends CustomClipper<Rect> {
     double appearingRadius =
         dotRadius + factor * (maxAppearingRadius - dotRadius);
     return Rect.fromCircle(
-        center: Offset(x, y - radius), radius: appearingRadius);
+      center: Offset(x, y - ((1 - factor) * radius)),
+      radius: appearingRadius,
+    );
   }
 
   @override
