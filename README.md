@@ -1,13 +1,13 @@
 # Widget Loading
 
-<a href="https://pub.dev/packages/widget_loading"><img src="https://img.shields.io/pub/v/widget_loading.svg?style=flat?logo=dart" alt="pub.dev"></a>
-<a href="https://github.com/SplashByte/widget_loading"><img src="https://img.shields.io/static/v1?label=platform&message=flutter&color=1ebbfd" alt="github"></a>
-[![likes](https://badges.bar/widget_loading/likes)](https://pub.dev/packages/widget_loading/score)
-[![popularity](https://badges.bar/widget_loading/popularity)](https://pub.dev/packages/widget_loading/score)
-[![pub points](https://badges.bar/widget_loading/pub%20points)](https://pub.dev/packages/widget_loading/score)
-<a href="https://github.com/SplashByte/widget_loading/blob/main/LICENSE"><img src="https://img.shields.io/github/license/SplashByte/widget_loading.svg" alt="license"></a>
+[![pub.dev](https://img.shields.io/pub/v/widget_loading.svg?style=flat?logo=dart)](https://pub.dev/packages/widget_loading)
+[![github](https://img.shields.io/static/v1?label=platform&message=flutter&color=1ebbfd)](https://github.com/SplashByte/widget_loading)
+[![likes](https://img.shields.io/pub/likes/widget_loading)](https://pub.dev/packages/widget_loading/score)
+[![popularity](https://img.shields.io/pub/popularity/widget_loading)](https://pub.dev/packages/widget_loading/score)
+[![pub points](https://img.shields.io/pub/points/widget_loading)](https://pub.dev/packages/widget_loading/score)
+[![license](https://img.shields.io/github/license/SplashByte/widget_loading.svg)](https://github.com/SplashByte/widget_loading/blob/main/LICENSE)
 
-[![buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/splashbyte)
+[![buy me a coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20pizza&emoji=🍕&slug=splashbyte&button_colour=FF8838&font_colour=ffffff&font_family=Poppins&outline_colour=000000&coffee_colour=ffffff')](https://www.buymeacoffee.com/splashbyte)
 
 ### If you like this package, please leave a like there on [pub.dev](https://pub.dev/packages/widget_loading) and star on [GitHub](https://github.com/SplashByte/widget_loading).
 
