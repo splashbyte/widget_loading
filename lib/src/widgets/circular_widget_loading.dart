@@ -23,25 +23,25 @@ class CircularWidgetLoading extends StatefulWidget {
   /// Size of the smallest dot relative to the [dotRadius]. Must be between 0 and 1.
   final double minDotRadiusFactor;
 
-  /// Duration of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
+  /// [Duration] of the [AnimatedSize]. For deactivating AnimatedSize you can use [animatedSize].
   final Duration sizeDuration;
 
-  /// Duration of the appearing/disappearing of the [child].
+  /// [Duration] of the appearing/disappearing of the [child].
   final Duration appearingDuration;
 
-  /// Duration of the loading-animation.
+  /// [Duration] of the loading-animation.
   final Duration loadingDuration;
 
-  /// Curve of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
+  /// [Curve] of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
   final Curve sizeCurve;
 
-  /// Curve of the appearing/disappearing of the [child].
+  /// [Curve] of the appearing/disappearing of the [child].
   final Curve appearingCurve;
 
-  /// Curve of the loading-animation.
+  /// [Curve] of the loading-animation.
   final Curve loadingCurve;
 
-  /// Color of the dots
+  /// [Color] of the dots
   final Color? dotColor;
 
   /// Padding of child
@@ -50,20 +50,26 @@ class CircularWidgetLoading extends StatefulWidget {
   /// Builder of the dots. If it is not set, the standard builder is used.
   final DotBuilder? dotBuilder;
 
-  /// Duration of moving dots relative to the [loadingDuration]. Must be between 0 and 1.
+  /// [Duration] of moving dots relative to the [loadingDuration]. Must be between 0 and 1.
   final double rollingDuration;
 
-  /// Duration of the moving of a single dot relative to the [rollingDuration]. Must be between 0 and 1.
+  /// [Duration] of the moving of a single dot relative to the [rollingDuration]. Must be between 0 and 1.
   final double rollingFactor;
 
   /// Count of the dots in the loading-circle.
   final int dotCount;
 
-  /// Activating/deactivating AnimatedSize-Wrapper of [child].
+  /// Activating/deactivating [AnimatedSize] wrapper of [child].
   final bool animatedSize;
 
   /// Padding of LoadingCircle. Prevents it from touching the edges.
   final double loadingCirclePadding;
+
+  /// [Duration] of the appearing animation of the dot.
+  final Duration dotAppearingDuration;
+
+  /// [Curve] of the appearing animation of the dot.
+  final Curve dotAppearingCurve;
 
   const CircularWidgetLoading({
     Key? key,
@@ -86,6 +92,8 @@ class CircularWidgetLoading extends StatefulWidget {
     this.animatedSize = true,
     this.minDotRadiusFactor = 0.5,
     this.loadingCirclePadding = 8.0,
+    this.dotAppearingDuration = Duration.zero,
+    this.dotAppearingCurve = Curves.easeOutBack,
   }) : super(key: key);
 
   @override
@@ -98,6 +106,8 @@ class _CircularWidgetLoadingState
   late AnimationController _controller;
   late AnimationController _appearingController;
   late CurvedAnimation _appearingAnimation;
+  late AnimationController _dotAppearingController;
+  late CurvedAnimation _dotAppearingAnimation;
   List<CurvedAnimation> _animations = [];
 
   final _childKey = GlobalKey();
@@ -114,6 +124,13 @@ class _CircularWidgetLoadingState
     assert(widget.minDotRadiusFactor >= 0 && widget.minDotRadiusFactor <= 1);
 
     _child = widget.child;
+
+    _dotAppearingController =
+        AnimationController(vsync: this, duration: widget.dotAppearingDuration)
+          ..forward();
+
+    _dotAppearingAnimation = CurvedAnimation(
+        parent: _dotAppearingController, curve: widget.dotAppearingCurve);
 
     _appearingController = AnimationController(
       duration: widget.appearingDuration,
@@ -196,6 +213,7 @@ class _CircularWidgetLoadingState
   void dispose() {
     _controller.dispose();
     _appearingController.dispose();
+    _dotAppearingController.dispose();
     super.dispose();
   }
 
@@ -266,28 +284,32 @@ class _CircularWidgetLoadingState
                 double x = constraints.maxWidth / 2;
                 double y = constraints.maxHeight / 2;
 
-                return Stack(
-                    children:
-                        List.generate(_animations.length, (index) => index)
-                            .map((i) {
-                  Animation animation = _animations[i];
-                  double dotRadius = widget.dotRadius *
-                      (widget.minDotRadiusFactor +
-                          (1 - widget.minDotRadiusFactor) *
-                              (1 - i / _animations.length));
-                  return AnimatedBuilder(
-                      animation: animation,
-                      child: widget.dotBuilder?.call(widget.dotRadius) ??
-                          loadingPoint(dotRadius, dotColor),
-                      builder: (context, child) {
-                        double radian = 0.5 * pi - 2 * pi * animation.value;
-                        return Positioned(
-                          child: child!,
-                          top: y - radius * sin(radian) - dotRadius,
-                          left: x - radius * cos(radian) - dotRadius,
-                        );
-                      });
-                }).toList());
+                return AnimatedBuilder(
+                  animation: _dotAppearingAnimation,
+                  builder: (context, _) => Stack(
+                      children:
+                          List.generate(_animations.length, (index) => index)
+                              .map((i) {
+                    Animation animation = _animations[i];
+                    double dotRadius = _dotAppearingAnimation.value *
+                        widget.dotRadius *
+                        (widget.minDotRadiusFactor +
+                            (1 - widget.minDotRadiusFactor) *
+                                (1 - i / _animations.length));
+                    return AnimatedBuilder(
+                        animation: animation,
+                        child: widget.dotBuilder?.call(widget.dotRadius) ??
+                            loadingPoint(dotRadius, dotColor),
+                        builder: (context, child) {
+                          double radian = 0.5 * pi - 2 * pi * animation.value;
+                          return Positioned(
+                            child: child!,
+                            top: y - radius * sin(radian) - dotRadius,
+                            left: x - radius * cos(radian) - dotRadius,
+                          );
+                        });
+                  }).toList()),
+                );
               },
             ),
           ),

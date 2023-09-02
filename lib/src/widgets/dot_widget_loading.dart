@@ -24,24 +24,24 @@ class DotWidgetLoading extends StatefulWidget {
   /// Duration of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
   final Duration sizeDuration;
 
-  /// Duration of the appearing/disappearing of the [child].
+  /// [Duration] of the appearing/disappearing of the [child].
   final Duration appearingDuration;
 
-  /// Duration of the loading-animation.
+  /// [Duration] of the loading animation.
   final Duration loadingDuration;
 
   final double dotInterval;
 
-  /// Curve of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
+  /// [Curve] of the AnimatedSize. For deactivating AnimatedSize you can use [animatedSize].
   final Curve sizeCurve;
 
-  /// Curve of the appearing/disappearing of the [child].
+  /// [Curve] of the appearing/disappearing of the [child].
   final Curve appearingCurve;
 
-  /// Curve of the loading-animation.
+  /// [Curve] of the loading animation.
   final Curve loadingCurve;
 
-  /// Color of the dots
+  /// [Color] of the dots
   final Color? dotColor;
 
   /// Padding of child
