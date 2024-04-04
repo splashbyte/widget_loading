@@ -1,7 +1,11 @@
 ## 0.4.0 (2024-04-04)
 
-- adds `onLoadingAnimationCompleted` and `animating` parameter to `CircularWidgetLoading`
-- adds `index` to `DotBuilder`
+- Adds `onLoadingAnimationCompleted` and `animating` parameter to `CircularWidgetLoading`
+- Adds `index` to `DotBuilder`
+
+## 0.3.3 (2023-08-14)
+
+- Fixes clip offset for `CircularWidgetLoading`
 
 ## 0.3.2 (2022-06-13)
 
