@@ -6,13 +6,16 @@ import 'package:widget_loading/src/utils/loading_state.dart';
 import 'package:widget_loading/src/widgets/loading_widget.dart';
 import 'package:widget_loading/src/widgets/widget_wrapper.dart';
 
-typedef DotBuilder = Widget Function(double radius);
+typedef DotBuilder = Widget Function(int index, double radius);
 
 class CircularWidgetLoading extends StatefulWidget {
   final Widget child;
 
   /// Indicates whether the widget/data is loaded.
   final bool loading;
+
+  /// Indicates whether the animation should be played.
+  final bool animating;
 
   /// Maximal size of the loading-circle. It's size will be smaller, if there is not enough space.
   final double maxLoadingCircleSize;
@@ -71,6 +74,9 @@ class CircularWidgetLoading extends StatefulWidget {
   /// [Curve] of the appearing animation of the dot.
   final Curve dotAppearingCurve;
 
+  /// Called when loading animation completed after setting [animating] or [loading] to [false].
+  final VoidCallback? onLoadingAnimationCompleted;
+
   const CircularWidgetLoading({
     Key? key,
     this.loading = true,
@@ -94,6 +100,8 @@ class CircularWidgetLoading extends StatefulWidget {
     this.loadingCirclePadding = 8.0,
     this.dotAppearingDuration = Duration.zero,
     this.dotAppearingCurve = Curves.easeOutBack,
+    this.animating = true,
+    this.onLoadingAnimationCompleted,
   }) : super(key: key);
 
   @override
@@ -140,7 +148,7 @@ class _CircularWidgetLoadingState
           case AnimationStatus.dismissed:
             if (disappearing) {
               loadingState = LoadingState.LOADING;
-              _controller.forward(from: 0.0);
+              if (widget.animating) _controller.forward(from: 0.0);
             }
             break;
           case AnimationStatus.completed:
@@ -171,8 +179,11 @@ class _CircularWidgetLoadingState
             if (!widget.loading && loading) {
               loadingState = LoadingState.APPEARING;
               _appearingController.forward(from: 0.0);
-            } else {
+              widget.onLoadingAnimationCompleted?.call();
+            } else if (widget.animating) {
               _controller.forward(from: 0.0);
+            } else {
+              widget.onLoadingAnimationCompleted?.call();
             }
             break;
         }
@@ -255,6 +266,13 @@ class _CircularWidgetLoadingState
       setLoadingState(LoadingState.APPEARING, rebuild: false);
       _appearingController.forward();
     }
+
+    if (widget.animating &&
+        widget.loading &&
+        !_controller.isAnimating &&
+        !_appearingController.isAnimating) {
+      _controller.forward(from: 0.0);
+    }
   }
 
   @override
@@ -287,19 +305,18 @@ class _CircularWidgetLoadingState
                 return AnimatedBuilder(
                   animation: _dotAppearingAnimation,
                   builder: (context, _) => Stack(
-                      children:
-                          List.generate(_animations.length, (index) => index)
-                              .map((i) {
-                    Animation animation = _animations[i];
+                      children: List.generate(_animations.length, (index) {
+                    Animation animation = _animations[index];
                     double dotRadius = _dotAppearingAnimation.value *
                         widget.dotRadius *
                         (widget.minDotRadiusFactor +
                             (1 - widget.minDotRadiusFactor) *
-                                (1 - i / _animations.length));
+                                (1 - index / _animations.length));
                     return AnimatedBuilder(
                         animation: animation,
-                        child: widget.dotBuilder?.call(widget.dotRadius) ??
-                            loadingPoint(dotRadius, dotColor),
+                        child:
+                            widget.dotBuilder?.call(index, dotRadius) ??
+                                loadingPoint(dotRadius, dotColor),
                         builder: (context, child) {
                           double radian = 0.5 * pi - 2 * pi * animation.value;
                           return Positioned(
@@ -308,7 +325,7 @@ class _CircularWidgetLoadingState
                             left: x - radius * cos(radian) - dotRadius,
                           );
                         });
-                  }).toList()),
+                  })),
                 );
               },
             ),
