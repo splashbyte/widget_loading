@@ -1,6 +1,6 @@
-## 0.3.3 (2023-08-14)
+## 0.4.0 (2024-04-04)
 
-- Fixes clip offset for `CircularWidgetLoading`
+- adds `onLoadingAnimationCompleted` and `animating` parameter to `CircularWidgetLoading`
 
 ## 0.3.2 (2022-06-13)
 
