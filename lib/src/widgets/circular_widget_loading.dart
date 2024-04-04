@@ -314,9 +314,8 @@ class _CircularWidgetLoadingState
                                 (1 - index / _animations.length));
                     return AnimatedBuilder(
                         animation: animation,
-                        child:
-                            widget.dotBuilder?.call(index, dotRadius) ??
-                                loadingPoint(dotRadius, dotColor),
+                        child: widget.dotBuilder?.call(index, dotRadius) ??
+                            loadingPoint(dotRadius, dotColor),
                         builder: (context, child) {
                           double radian = 0.5 * pi - 2 * pi * animation.value;
                           return Positioned(

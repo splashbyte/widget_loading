@@ -47,7 +47,7 @@ class _ExampleState extends State<Example> {
         child: ListTile(
           leading: Text(
             'Loaded!',
-            style: Theme.of(context).textTheme.headline5,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           trailing: Icon(
             Icons.account_circle,
@@ -173,11 +173,11 @@ class _ExampleState extends State<Example> {
               child: ListTile(
                 leading: Text(
                   'Counter',
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 trailing: Text(
                   '$counter',
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
             ),
@@ -201,11 +201,11 @@ class _ExampleState extends State<Example> {
                 child: ListTile(
                   leading: Text(
                     'Counter',
-                    style: Theme.of(context).textTheme.headline5,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   trailing: Text(
                     '$counter',
-                    style: Theme.of(context).textTheme.headline5,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 )),
           ),
