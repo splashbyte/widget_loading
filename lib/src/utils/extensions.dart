@@ -29,7 +29,7 @@ extension Derivation on CurvedAnimation {
 }
 
 extension _XNumber on num {
-  bool closeTo(num other, [num epsilon = 0.001]) =>
+  bool closeTo(num other, [num epsilon = 0.0001]) =>
       this > other - epsilon && this < other + epsilon;
 }
 
