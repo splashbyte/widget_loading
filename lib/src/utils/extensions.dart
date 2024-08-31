@@ -11,12 +11,12 @@ extension Derivation on CurvedAnimation {
     switch (this.status) {
       case AnimationStatus.forward:
         double value = max(this.parent.value - dif, 0.0);
-        if (value == this.parent.value) return 0.0;
+        if (value.closeTo(this.parent.value)) return 0.0;
         return (this.value - this.curve.transform(value)) /
             (this.parent.value - value);
       case AnimationStatus.reverse:
         double value = min(this.parent.value + dif, 1.0);
-        if (value == this.parent.value) return 0.0;
+        if (value.closeTo(this.parent.value)) return 0.0;
         return (this.value - this.curve.transform(value)) /
             (value - this.parent.value);
       case AnimationStatus.dismissed:
@@ -26,6 +26,11 @@ extension Derivation on CurvedAnimation {
 
     return 0.0;
   }
+}
+
+extension _XNumber on num {
+  bool closeTo(num other, [num epsilon = 0.001]) =>
+      this > other - epsilon && this < other + epsilon;
 }
 
 extension Diagonal on Size {
